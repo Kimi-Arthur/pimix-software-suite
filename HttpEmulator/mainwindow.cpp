@@ -44,16 +44,27 @@ void MainWindow::on_requestButton_clicked()
 void MainWindow::receiveReply(QNetworkReply *reply)
 {
     QByteArray content = reply->readAll();
-    ui->rawOutput->setPlainText(QString::fromUtf8(content.replace('\0', "\\0")));
+    ui->rawOutput->clear();
     ui->hexOutput->clear();
-    QString line;
+    QString hexLine, rawLine;
     for (int i = 0; i < content.size(); i++) {
         if (!(i & 0xF)) {
-            if (i)
-                ui->hexOutput->append(line);
-            line = QStringLiteral("0x%1").arg(QString::number(i, 16).rightJustified(4, '0', true));
+            if (i) {
+                ui->hexOutput->append(hexLine);
+                ui->rawOutput->append(rawLine);
+            }
+            rawLine = hexLine = QStringLiteral("0x%1").arg(QString::number(i, 16).rightJustified(4, '0', true));
         }
-        line.append(QStringLiteral(" %1").arg(QString::number(content.at(i), 16).rightJustified(2, '0', true)));
+        QString number = QStringLiteral(" %1").arg(QString::number(content.at(i), 16).rightJustified(2, '0', true));
+        if (content.at(i) > 0 && content.at(i) < 128)
+            rawLine.append(QStringLiteral("%1").arg(content.at(i), 3, QChar(' ')));
+        else
+            rawLine.append(number);
+        hexLine.append(number);
+    }
+    if (content.size() & 0xF) {
+        ui->hexOutput->append(hexLine);
+        ui->rawOutput->append(rawLine);
     }
     reply->deleteLater();
 }
