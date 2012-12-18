@@ -66,5 +66,6 @@ void MainWindow::receiveReply(QNetworkReply *reply)
         ui->hexOutput->append(hexLine);
         ui->rawOutput->append(rawLine);
     }
+    ui->htmlOutput->setHtml(content);
     reply->deleteLater();
 }
