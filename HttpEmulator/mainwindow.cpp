@@ -2,11 +2,23 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 
+QString process(char input)
+{
+    if (input == '\t')
+        return "\\t";
+    if (input == '\n')
+        return "\\n";
+    if (input < 32)
+        return QString::number(input, 16).rightJustified(2, '0', true);
+    return input;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(receiveReply(QNetworkReply*)));
+    manager.setCookieJar(&cookieJar);
     ui->setupUi(this);
 }
 
@@ -17,28 +29,44 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_requestButton_clicked()
 {
-    QString uri = ui->uriLine->text();
+    QUrl url(ui->uriLine->text());
+    QString hostname(url.host());
     QString method = ui->methodCombo->currentText();
     QString raw_data = ui->dataEdit->toPlainText();
     QByteArray data;
-    if (ui->dataModeCombo->currentText() == "Hex Mode") {
+    if (ui->rawModeButton->isChecked())
+        data = raw_data.toUtf8();
+    if (ui->hexModeRadio->isChecked()) {
         raw_data = raw_data.toUpper().remove(QRegularExpression("[^0-9A-F]"));
         for (int i = 0; i < raw_data.size(); i += 2)
             data += raw_data.mid(i, 2).toInt(0, 16);
-    } else {
-        data = raw_data.toUtf8();
+    }
+    if (ui->fileModeButton->isChecked()) {
+        data = "";
     }
 
+    foreach (auto cookie, cookieJar.cookiesForUrl(hostname))
+        cookieJar.deleteCookie(cookie);
+
     QString cookies = ui->cookieEdit->toPlainText();
+    foreach (QString cookie, cookies.split(";")) {
+        QStringList l = cookie.split("=");
+        if (l.size() != 2)
+            continue;
+        QNetworkCookie o(l[0].toUtf8(), l[1].toUtf8());
+        o.setDomain(hostname);
+        cookieJar.insertCookie(o);
+    }
+
     if (method == "GET")
-        manager.get(QNetworkRequest(uri));
+        manager.get(QNetworkRequest(url));
     if (method == "POST") {
-        manager.post(QNetworkRequest(uri), data);
+        manager.post(QNetworkRequest(url), data);
     }
     if (method == "PUT")
-        manager.put(QNetworkRequest(uri), data);
+        manager.put(QNetworkRequest(url), data);
     if (method == "DELETE")
-        manager.deleteResource(QNetworkRequest(uri));
+        manager.deleteResource(QNetworkRequest(url));
 }
 
 void MainWindow::receiveReply(QNetworkReply *reply)
@@ -56,10 +84,7 @@ void MainWindow::receiveReply(QNetworkReply *reply)
             rawLine = hexLine = QStringLiteral("0x%1").arg(QString::number(i, 16).rightJustified(4, '0', true));
         }
         QString number = QStringLiteral(" %1").arg(QString::number(content.at(i), 16).rightJustified(2, '0', true));
-        if (content.at(i) > 0 && content.at(i) < 128)
-            rawLine.append(QStringLiteral("%1").arg(content.at(i), 3, QChar(' ')));
-        else
-            rawLine.append(number);
+        rawLine.append(QStringLiteral("%1").arg(process(content.at(i)), 3, QChar(' ')));
         hexLine.append(number);
     }
     if (content.size() & 0xF) {

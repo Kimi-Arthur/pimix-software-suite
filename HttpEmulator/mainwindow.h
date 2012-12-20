@@ -6,6 +6,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QRegularExpression>
+#include <QNetworkCookieJar>
+#include <QNetworkCookie>
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +28,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager manager;
+    QNetworkCookieJar cookieJar;
 };
 
 #endif // MAINWINDOW_H
