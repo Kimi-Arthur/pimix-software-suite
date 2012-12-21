@@ -200,6 +200,26 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_5">
+          <attribute name="title">
+           <string>Hex Stream</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QTextBrowser" name="hexStreamOutput"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_4">
+          <attribute name="title">
+           <string>Raw Stream</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QTextBrowser" name="rawStreamOutput"/>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>

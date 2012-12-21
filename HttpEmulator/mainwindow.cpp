@@ -75,6 +75,7 @@ void MainWindow::receiveReply(QNetworkReply *reply)
     ui->rawOutput->clear();
     ui->hexOutput->clear();
     QString hexLine, rawLine;
+    QByteArray hexContent = content.toHex();
     for (int i = 0; i < content.size(); i++) {
         if (!(i & 0xF)) {
             if (i) {
@@ -83,14 +84,15 @@ void MainWindow::receiveReply(QNetworkReply *reply)
             }
             rawLine = hexLine = QStringLiteral("0x%1").arg(QString::number(i, 16).rightJustified(4, '0', true));
         }
-        QString number = QStringLiteral(" %1").arg(QString::number(content.at(i), 16).rightJustified(2, '0', true));
         rawLine.append(QStringLiteral("%1").arg(process(content.at(i)), 3, QChar(' ')));
-        hexLine.append(number);
+        hexLine.append(QStringLiteral(" %1%2").arg(hexContent.at(i * 2)).arg(hexContent.at(i * 2 + 1)));
     }
     if (content.size() & 0xF) {
         ui->hexOutput->append(hexLine);
         ui->rawOutput->append(rawLine);
     }
     ui->htmlOutput->setHtml(content);
+    ui->hexStreamOutput->setText(hexContent.toUpper());;
+    ui->rawStreamOutput->setText(content);
     reply->deleteLater();
 }
