@@ -2,6 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 
+// Local functions
+QNetworkProxy getProxy(const QString &proxyString);
+
 QString process(char input)
 {
     if (input == '\t')
@@ -32,14 +35,14 @@ void MainWindow::on_requestButton_clicked()
     QUrl url(ui->uriLine->text());
     QString hostname(url.host());
     QString method = ui->methodCombo->currentText();
-    QString raw_data = ui->dataEdit->toPlainText();
+    QString rawData = ui->dataEdit->toPlainText();
     QByteArray data;
     if (ui->rawModeButton->isChecked())
-        data = raw_data.toUtf8();
+        data = rawData.toUtf8();
     if (ui->hexModeRadio->isChecked()) {
-        raw_data = raw_data.toUpper().remove(QRegularExpression("[^0-9A-F]"));
-        for (int i = 0; i < raw_data.size(); i += 2)
-            data += raw_data.mid(i, 2).toInt(0, 16);
+        rawData = rawData.toUpper().remove(QRegularExpression("[^0-9A-F]"));
+        for (int i = 0; i < rawData.size(); i += 2)
+            data += rawData.mid(i, 2).toInt(0, 16);
     }
     if (ui->fileModeButton->isChecked()) {
         data = "";
@@ -57,6 +60,8 @@ void MainWindow::on_requestButton_clicked()
         o.setDomain(hostname);
         cookieJar.insertCookie(o);
     }
+
+    manager.setProxy(getProxy(ui->proxyLine->text()));
 
     if (method == "GET")
         manager.get(QNetworkRequest(url));
@@ -95,4 +100,12 @@ void MainWindow::receiveReply(QNetworkReply *reply)
     ui->hexStreamOutput->setText(hexContent.toUpper());;
     ui->rawStreamOutput->setText(content);
     reply->deleteLater();
+}
+
+QNetworkProxy getProxy(const QString &proxyString)
+{
+    auto result = QRegularExpression("^((?<username>.*):(?<password>.*)@)?(?<hostname>[\\.a-zA-Z0-9]+):(?<port>\\d+)$").match(proxyString);
+    if (result.hasMatch())
+        return QNetworkProxy(QNetworkProxy::DefaultProxy, result.captured("hostname"), result.captured("port").toInt(), result.captured("username"), result.captured("password"));
+    else return QNetworkProxy();
 }

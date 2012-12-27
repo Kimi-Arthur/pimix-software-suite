@@ -8,6 +8,7 @@
 #include <QRegularExpression>
 #include <QNetworkCookieJar>
 #include <QNetworkCookie>
+#include <QNetworkProxy>
 
 namespace Ui {
 class MainWindow;
