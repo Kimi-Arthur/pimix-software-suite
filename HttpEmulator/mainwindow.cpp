@@ -62,6 +62,7 @@ void MainWindow::on_requestButton_clicked()
     }
 
     manager.setProxy(getProxy(ui->proxyLine->text()));
+    qDebug() << manager.proxy();
 
     if (method == "GET")
         manager.get(QNetworkRequest(url));
@@ -104,8 +105,8 @@ void MainWindow::receiveReply(QNetworkReply *reply)
 
 QNetworkProxy getProxy(const QString &proxyString)
 {
-    auto result = QRegularExpression("^((?<username>.*):(?<password>.*)@)?(?<hostname>[\\.a-zA-Z0-9]+):(?<port>\\d+)$").match(proxyString);
+    auto result = QRegularExpression("^((?<username>.*):(?<password>.*)@)?(?<hostname>[\\.a-zA-Z0-9\\-]+):(?<port>\\d+)$").match(proxyString);
     if (result.hasMatch())
-        return QNetworkProxy(QNetworkProxy::DefaultProxy, result.captured("hostname"), result.captured("port").toInt(), result.captured("username"), result.captured("password"));
+        return QNetworkProxy(QNetworkProxy::HttpProxy, result.captured("hostname"), result.captured("port").toInt(), result.captured("username"), result.captured("password"));
     else return QNetworkProxy();
 }
