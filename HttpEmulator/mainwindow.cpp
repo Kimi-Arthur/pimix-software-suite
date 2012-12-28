@@ -1,9 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ptnetwork.h"
 #include <QDebug>
 
 // Local functions
-QNetworkProxy getProxy(const QString &proxyString);
 
 QString process(char input)
 {
@@ -61,7 +61,7 @@ void MainWindow::on_requestButton_clicked()
         cookieJar.insertCookie(o);
     }
 
-    manager.setProxy(getProxy(ui->proxyLine->text()));
+    manager.setProxy(Pt::getProxy(ui->proxyLine->text()));
     qDebug() << manager.proxy();
 
     if (method == "GET")
@@ -78,6 +78,7 @@ void MainWindow::on_requestButton_clicked()
 void MainWindow::receiveReply(QNetworkReply *reply)
 {
     QByteArray content = reply->readAll();
+    qDebug() << content;
     ui->rawOutput->clear();
     ui->hexOutput->clear();
     QString hexLine, rawLine;
@@ -101,12 +102,4 @@ void MainWindow::receiveReply(QNetworkReply *reply)
     ui->hexStreamOutput->setText(hexContent.toUpper());;
     ui->rawStreamOutput->setText(content);
     reply->deleteLater();
-}
-
-QNetworkProxy getProxy(const QString &proxyString)
-{
-    auto result = QRegularExpression("^((?<username>.*):(?<password>.*)@)?(?<hostname>[\\.a-zA-Z0-9\\-]+):(?<port>\\d+)$").match(proxyString);
-    if (result.hasMatch())
-        return QNetworkProxy(QNetworkProxy::HttpProxy, result.captured("hostname"), result.captured("port").toInt(), result.captured("username"), result.captured("password"));
-    else return QNetworkProxy();
 }
