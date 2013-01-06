@@ -94,10 +94,8 @@ void MainWindow::receiveReply(QNetworkReply *reply)
         rawLine.append(QStringLiteral("%1").arg(process(content.at(i)), 3, QChar(' ')));
         hexLine.append(QStringLiteral(" %1%2").arg(hexContent.at(i * 2)).arg(hexContent.at(i * 2 + 1)));
     }
-    if (content.size() & 0xF) {
-        ui->hexOutput->append(hexLine);
-        ui->rawOutput->append(rawLine);
-    }
+    ui->hexOutput->append(hexLine);
+    ui->rawOutput->append(rawLine);
     ui->htmlOutput->setHtml(content);
     ui->hexStreamOutput->setText(hexContent.toUpper());;
     ui->rawStreamOutput->setText(content);
