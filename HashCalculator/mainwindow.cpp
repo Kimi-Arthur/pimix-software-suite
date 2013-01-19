@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -66,11 +67,13 @@ void MainWindow::on_hashButton_clicked()
     }
     if (ui->fileModeRadio->isChecked()) {
         QFile file(ui->fileWidget->getPath());
-        file.open(QIODevice::ReadOnly);
+        qDebug() << ui->fileWidget->getPath();
+        qDebug() << file.open(QIODevice::ReadOnly);
         for (int algorithm = 0; algorithm < algorithms.size(); algorithm++) {
             file.reset();
             QCryptographicHash::Algorithm alg = QCryptographicHash::Algorithm(algorithm);
             QCryptographicHash hasher(alg);
+            hasher.addData(&file);
             outputLines[algorithm]->setText(hasher.result().toHex().toUpper());
         }
     }
