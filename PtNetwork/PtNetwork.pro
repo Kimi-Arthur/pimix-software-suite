@@ -8,6 +8,8 @@ QT       += network
 
 QT       -= gui
 
+CONFIG += C++11
+
 TARGET = PtNetwork
 TEMPLATE = lib
 
