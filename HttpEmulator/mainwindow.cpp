@@ -13,7 +13,7 @@ QString process(char input)
         return "\\n";
     if (input < 32)
         return QString::number(input, 16).rightJustified(2, '0', true);
-    return input;
+    return QString(input);
 }
 
 MainWindow::MainWindow(QWidget *parent) :
