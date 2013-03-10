@@ -18,7 +18,8 @@ DEFINES += PTNETWORK_LIBRARY
 SOURCES += ptnetwork.cpp
 
 HEADERS += ptnetwork.h\
-        PtNetwork_global.h
+        PtNetwork_global.h \
+    PNetworkTask.h
 
 unix:!symbian {
     maemo5 {
