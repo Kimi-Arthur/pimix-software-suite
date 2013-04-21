@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     PtNetwork \
-	PtGui
+    PtGui \
+    PtLogging
