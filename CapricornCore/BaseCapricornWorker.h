@@ -2,6 +2,7 @@
 #define BASECAPRICORNWORKER_H
 
 #include <QString>
+#include <QJsonObject>
 
 class BaseCapricornWorker
 {
