@@ -11,10 +11,12 @@ TEMPLATE = lib
 
 DEFINES += CAPRICORNCORE_LIBRARY
 
-SOURCES += CapricornCore.cpp
+SOURCES += CapricornCore.cpp \
+    BaseCapricornWorker.cpp
 
 HEADERS += CapricornCore.h\
         capricorncore_global.h \
+    CapricornWorker.h \
     BaseCapricornWorker.h
 
 unix:!symbian {
