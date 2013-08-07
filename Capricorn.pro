@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     CapricornCore \
-    CapricornWorkerPlugins
+    CapricornWorkerPlugins \
+    ConsoleCapricornRunner

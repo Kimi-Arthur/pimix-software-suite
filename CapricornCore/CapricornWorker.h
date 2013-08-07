@@ -1,6 +1,7 @@
 #ifndef CAPRICORNWORKER_H
 #define CAPRICORNWORKER_H
 
+#include <QObject>
 #include <QString>
 #include <QJsonObject>
 #include "capricorncore_global.h"
@@ -20,5 +21,9 @@ public:
     virtual int progressMaximum() = 0;
     virtual QString progressText() = 0;
 };
+
+#define CapricornWorker_iid "org.pimix.capricorn.worker"
+
+Q_DECLARE_INTERFACE(CapricornWorker, CapricornWorker_iid)
 
 #endif // CAPRICORNWORKER_H

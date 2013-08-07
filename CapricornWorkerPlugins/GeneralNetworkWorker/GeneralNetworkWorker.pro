@@ -16,6 +16,8 @@ SOURCES += GeneralNetworkWorker.cpp
 HEADERS += GeneralNetworkWorker.h\
         generalnetworkworker_global.h
 
+DLLDESTDIR = $$PWD/../../bin
+
 unix:!symbian {
     maemo5 {
         target.path = /opt/usr/lib

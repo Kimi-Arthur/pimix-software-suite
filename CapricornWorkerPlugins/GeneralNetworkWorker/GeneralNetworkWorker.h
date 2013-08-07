@@ -3,10 +3,12 @@
 
 #include "generalnetworkworker_global.h"
 #include "BaseCapricornWorker.h"
+#include <QObject>
 
-class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public BaseCapricornWorker
+class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public QObject, public BaseCapricornWorker
 {
-    
+    Q_OBJECT
+    Q_INTERFACES(CapricornWorker)
 public:
     GeneralNetworkWorker();
     virtual ResultType startJob(QJsonObject jobInfo);

@@ -1,5 +1,5 @@
 #include "GeneralNetworkWorker.h"
-
+#include <QDebug>
 
 GeneralNetworkWorker::GeneralNetworkWorker()
 {
@@ -7,6 +7,7 @@ GeneralNetworkWorker::GeneralNetworkWorker()
 
 BaseCapricornWorker::ResultType GeneralNetworkWorker::startJob(QJsonObject jobInfo)
 {
+    qDebug() << "ok";
     return Success;
 }
 
