@@ -12,11 +12,11 @@ TEMPLATE = lib
 DEFINES += PTGUI_LIBRARY
 
 SOURCES += \
-    filechooserwidget.cpp
+    PFileChooserWidget.cpp
 
 HEADERS +=\
         PtGui_global.h \
-    filechooserwidget.h
+    PFileChooserWidget.h
 
 unix:!symbian {
     maemo5 {
@@ -28,4 +28,4 @@ unix:!symbian {
 }
 
 FORMS += \
-    filechooserwidget.ui
+    PFileChooserWidget.ui

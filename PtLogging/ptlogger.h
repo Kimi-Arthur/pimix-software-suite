@@ -15,7 +15,7 @@ public:
     explicit PtLogger(QObject *parent = 0);
     Q_PROPERTY(QString outputFileName READ outputFileName WRITE setOutputFileName NOTIFY outputFileNameChanged)
     Q_PROPERTY(QString logPattern READ logPattern WRITE setLogPattern NOTIFY logPatternChanged)
-    void log(QStringList content = {}, QString type="INFO");
+    //void log(QStringList content = {}, QString type="INFO");
 private:
     Q_PROPERTY(QTextStream *outputStream READ outputStream WRITE setOutputStream RESET resetOutputStream NOTIFY outputStreamChanged)
 
@@ -34,9 +34,11 @@ public:
     {
         if (m_outputStream == nullptr) {
             // stdout not enabled
-            m_outputStream = new QFile(outputFileName());
-            if (!m_outputStream->open(QIODevice::Append))
-                return nullptr;
+            QFile *file = new QFile(outputFileName());
+            if (file->open(QIODevice::Append))
+                m_outputStream = new QTextStream(file);
+            else return nullptr;
+
         }
         return m_outputStream;
     }
@@ -76,7 +78,7 @@ void setLogPattern(QString arg)
 void setOutputStream(QFile * arg)
 {
     if (m_outputStream != arg) {
-        m_outputStream->close();
+        m_outputStream->device()->close();
         m_outputStream = arg;
         emit outputStreamChanged(arg);
     }

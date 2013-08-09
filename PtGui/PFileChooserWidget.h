@@ -1,21 +1,21 @@
-#ifndef FILECHOOSERWIDGET_H
-#define FILECHOOSERWIDGET_H
+#ifndef PFILECHOOSERWIDGET_H
+#define PFILECHOOSERWIDGET_H
 
 #include "PtGui_global.h"
 #include <QWidget>
 #include <QFileDialog>
 
 namespace Ui {
-class FileChooserWidget;
+class PFileChooserWidget;
 }
 
-class PTGUISHARED_EXPORT FileChooserWidget : public QWidget
+class PTGUISHARED_EXPORT PFileChooserWidget : public QWidget
 {
     Q_OBJECT
     
 public:
-    explicit FileChooserWidget(QWidget *parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0);
-    ~FileChooserWidget();
+    explicit PFileChooserWidget(QWidget *parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0);
+    ~PFileChooserWidget();
     QString getPath();
 
 private slots:
@@ -24,7 +24,7 @@ private slots:
     void on_pathLine_editingFinished();
 
 private:
-    Ui::FileChooserWidget *ui;
+    Ui::PFileChooserWidget *ui;
     QString filePath;
     // Parameters
     QString caption;

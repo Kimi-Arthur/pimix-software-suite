@@ -1,9 +1,9 @@
-#include "filechooserwidget.h"
-#include "ui_filechooserwidget.h"
+#include "PFileChooserWidget.h"
+#include "ui_PFileChooserWidget.h"
 
-FileChooserWidget::FileChooserWidget(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options) :
+PFileChooserWidget::PFileChooserWidget(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options) :
     QWidget(parent),
-    ui(new Ui::FileChooserWidget),
+    ui(new Ui::PFileChooserWidget),
     caption(caption),
     dir(dir),
     filter(filter),
@@ -13,17 +13,17 @@ FileChooserWidget::FileChooserWidget(QWidget *parent, const QString &caption, co
     ui->setupUi(this);
 }
 
-FileChooserWidget::~FileChooserWidget()
+PFileChooserWidget::~PFileChooserWidget()
 {
     delete ui;
 }
 
-QString FileChooserWidget::getPath()
+QString PFileChooserWidget::getPath()
 {
     return filePath;
 }
 
-void FileChooserWidget::on_browseButton_clicked()
+void PFileChooserWidget::on_browseButton_clicked()
 {
     QString result = QFileDialog::getOpenFileName(parentWidget(), caption, dir, filter, selectedFilter, options);
     if (!result.isEmpty()) {
@@ -32,7 +32,7 @@ void FileChooserWidget::on_browseButton_clicked()
     }
 }
 
-void FileChooserWidget::on_pathLine_editingFinished()
+void PFileChooserWidget::on_pathLine_editingFinished()
 {
     filePath = QDir::fromNativeSeparators(ui->pathLine->text());
 }
