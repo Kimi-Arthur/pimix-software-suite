@@ -19,6 +19,8 @@ HEADERS += CapricornCore.h\
     CapricornWorker.h \
     BaseCapricornWorker.h
 
+DLLDESTDIR = $$PWD/../bin
+
 unix:!symbian {
     maemo5 {
         target.path = /opt/usr/lib

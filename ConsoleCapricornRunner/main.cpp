@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QDebug>
 #include <QPluginLoader>
+#include "CapricornWorker.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,8 +18,11 @@ int main(int argc, char *argv[])
         rawCommand = input.readLine();
         QJsonObject command = QJsonDocument::fromJson(rawCommand.toUtf8()).object();
         qDebug() << command;
-        qDebug() << "C:/Users/jingbian/Projects/Capricorn/bin/" + command["uri"].toString() + ".dll";
-        QPluginLoader loader("C:/Users/jingbian/Projects/Capricorn/bin/" + command["uri"].toString() + ".dll");
+        //qDebug() << "C:/Users/jingbian/Projects/Capricorn/bin/" + command["uri"].toString() + ".dll";
+        QPluginLoader loader("C:/Users/jingbian/Projects/Capricorn/bin/GeneralNetworkWorker.dll");
         qDebug() << loader.load();
+        QObject *a = loader.instance();
+        CapricornWorker *b = qobject_cast<CapricornWorker *>(a);
+        qDebug() << b->startJob();
     }
 }

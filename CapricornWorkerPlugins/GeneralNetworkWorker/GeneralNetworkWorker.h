@@ -5,9 +5,12 @@
 #include "BaseCapricornWorker.h"
 #include <QObject>
 
+#define GeneralNetworkWorker_iid "org.Pimix.Capricorn.Worker.GeneralNetwork"
+
 class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public QObject, public BaseCapricornWorker
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID GeneralNetworkWorker_iid)
     Q_INTERFACES(CapricornWorker)
 public:
     GeneralNetworkWorker();

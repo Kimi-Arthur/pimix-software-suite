@@ -12,7 +12,7 @@ public:
     typedef enum {
         Success, Failure
     } ResultType;
-    virtual ResultType startJob(QJsonObject jobInfo) = 0;
+    virtual ResultType startJob(QJsonObject jobInfo=QJsonObject()) = 0;
     virtual ResultType stopJob() = 0;
     virtual ResultType pauseJob() = 0;
     virtual ResultType resumeJob() = 0;
@@ -22,7 +22,7 @@ public:
     virtual QString progressText() = 0;
 };
 
-#define CapricornWorker_iid "org.pimix.capricorn.worker"
+#define CapricornWorker_iid "org.Pimix.Capricorn.Worker"
 
 Q_DECLARE_INTERFACE(CapricornWorker, CapricornWorker_iid)
 
