@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
         qDebug() << loader.load();
         QObject *a = loader.instance();
         CapricornWorker *b = qobject_cast<CapricornWorker *>(a);
-        qDebug() << b->startJob();
+        qDebug() << b->startJob(command);
+        qDebug() << loader.metaData();
     }
 }

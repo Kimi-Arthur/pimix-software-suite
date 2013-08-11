@@ -6,6 +6,8 @@
 
 QT       -= gui
 
+QT       += concurrent
+
 TARGET = CapricornCore
 TEMPLATE = lib
 

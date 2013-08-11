@@ -14,14 +14,8 @@ class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public QObject, p
     Q_INTERFACES(CapricornWorker)
 public:
     GeneralNetworkWorker();
-    virtual ResultType startJob(QJsonObject jobInfo);
-    virtual ResultType stopJob();
-    virtual ResultType pauseJob();
-    virtual ResultType resumeJob();
-    virtual int progressValue();
-    virtual int progressMinimum();
-    virtual int progressMaximum();
-    virtual QString progressText();
+    ResultType download(QJsonObject jobInfo);
+    static QString text;
 };
 
 #endif // GENERALNETWORKWORKER_H

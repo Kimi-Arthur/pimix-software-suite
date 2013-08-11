@@ -1,48 +1,20 @@
 #include "GeneralNetworkWorker.h"
+#include <QThread>
 #include <QDebug>
+
+QString GeneralNetworkWorker::text = "abc";
 
 GeneralNetworkWorker::GeneralNetworkWorker()
 {
+    methods["download"] = static_cast<ExecuteMethod>(&GeneralNetworkWorker::download);
 }
 
-BaseCapricornWorker::ResultType GeneralNetworkWorker::startJob(QJsonObject jobInfo)
+CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
 {
-    qDebug() << "ok";
+    text += "abc";
+    while(1) {
+        qDebug() << jobInfo << text;
+        QThread::sleep(10);
+    }
     return Success;
-}
-
-BaseCapricornWorker::ResultType GeneralNetworkWorker::stopJob()
-{
-    return Success;
-}
-
-BaseCapricornWorker::ResultType GeneralNetworkWorker::pauseJob()
-{
-    return Success;
-}
-
-BaseCapricornWorker::ResultType GeneralNetworkWorker::resumeJob()
-{
-    return Success;
-}
-
-int GeneralNetworkWorker::progressValue()
-{
-    return 0;
-}
-
-int GeneralNetworkWorker::progressMinimum()
-{
-    return 0;
-}
-
-int GeneralNetworkWorker::progressMaximum()
-{
-    return 0;
-}
-
-QString GeneralNetworkWorker::progressText()
-{
-    // TODO
-    return "";
 }
