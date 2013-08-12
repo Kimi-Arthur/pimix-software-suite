@@ -4,6 +4,9 @@
 #include "generalnetworkworker_global.h"
 #include "BaseCapricornWorker.h"
 #include <QObject>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+
 
 #define GeneralNetworkWorker_iid "org.Pimix.Capricorn.Worker.GeneralNetwork"
 
@@ -16,6 +19,10 @@ public:
     GeneralNetworkWorker();
     ResultType download(QJsonObject jobInfo);
     static QString text;
+    int timeout;
+    int total, count;
+public slots:
+    void receivePayload(QNetworkReply *reply);
 };
 
 #endif // GENERALNETWORKWORKER_H

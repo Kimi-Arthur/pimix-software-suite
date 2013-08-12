@@ -7,6 +7,7 @@ BaseCapricornWorker::BaseCapricornWorker()
 
 CapricornWorker::ResultType BaseCapricornWorker::startJob(QJsonObject jobInfo)
 {
+    qDebug() << jobInfo;
     QString method = jobInfo["method"].toString();
     QtConcurrent::run(this, methods[method], jobInfo);
     return Success;

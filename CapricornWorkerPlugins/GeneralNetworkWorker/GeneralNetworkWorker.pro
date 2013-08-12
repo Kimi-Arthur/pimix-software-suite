@@ -6,6 +6,8 @@
 
 QT       -= gui
 
+QT += network
+
 TARGET = GeneralNetworkWorker
 TEMPLATE = lib
 
