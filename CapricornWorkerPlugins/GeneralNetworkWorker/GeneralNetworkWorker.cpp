@@ -3,8 +3,6 @@
 #include <QDebug>
 #include <QEventLoop>
 
-QString GeneralNetworkWorker::text = "abc";
-
 GeneralNetworkWorker::GeneralNetworkWorker()
 {
     methods["download"] = ExecuteMethod(&GeneralNetworkWorker::download);
@@ -12,10 +10,16 @@ GeneralNetworkWorker::GeneralNetworkWorker()
 
 CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
 {
+    qDebug() << jobInfo["path"].toString();
+    //text = jobInfo["path"].toString();
+    qDebug() << "b";
     timeout = 10 * 1000;
+    qDebug() << timeout;
     total = count = 0;
     QNetworkAccessManager manager;
     QJsonObject object = jobInfo["parameter"].toObject();
+ //   m.get(QNetworkRequest(object["url"].toString()));
+    qDebug() << timeout;
     QNetworkReply *reply = manager.get(QNetworkRequest(object["url"].toString()));
     qDebug() << "before";
     connect(reply, &QNetworkReply::readyRead, [=](){this->receivePayload(reply);});
@@ -31,7 +35,9 @@ CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
 
 void GeneralNetworkWorker::receivePayload(QNetworkReply *reply)
 {
+ //   text += "ok";
     total += reply->readAll().size();
     count++;
-    qDebug() << count << ":" << total;
+    if (count % 100 == 0)
+        qDebug() << count << ":" << total;// << text;
 }

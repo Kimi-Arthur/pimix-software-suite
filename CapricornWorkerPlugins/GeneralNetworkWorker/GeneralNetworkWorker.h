@@ -4,6 +4,7 @@
 #include "generalnetworkworker_global.h"
 #include "BaseCapricornWorker.h"
 #include <QObject>
+#include <QString>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
@@ -18,9 +19,10 @@ class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public QObject, p
 public:
     GeneralNetworkWorker();
     ResultType download(QJsonObject jobInfo);
-    static QString text;
+    QString text;
     int timeout;
     int total, count;
+    QNetworkAccessManager m;
 public slots:
     void receivePayload(QNetworkReply *reply);
 };

@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
         QPluginLoader loader("C:/Users/jingbian/Projects/Capricorn/bin/GeneralNetworkWorker.dll");
         qDebug() << loader.load();
         QObject *a = loader.instance();
+        qDebug() << "Object:" << a;
         CapricornWorker *b = qobject_cast<CapricornWorker *>(a);
         qDebug() << b->startJob(command);
         qDebug() << loader.metaData();
