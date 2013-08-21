@@ -57,5 +57,6 @@ CapricornWorker *BaseCapricornWorkerFactory::createInstance()
 
 void BaseCapricornWorkerFactory::destroyInstance(CapricornWorker *workerInstance)
 {
-    Q_ASSERT(workerInstances.removeAll(workerInstance) == 1);
+    int removedInstanceCount = workerInstances.removeAll(workerInstance);
+    Q_ASSERT(removedInstanceCount == 1);
 }
