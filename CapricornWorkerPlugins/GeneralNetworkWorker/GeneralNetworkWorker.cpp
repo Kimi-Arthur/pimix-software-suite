@@ -27,7 +27,7 @@ CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     qDebug() << "after";
     loop.exec();
-    qDebug() << reply->readAll().size();
+    qDebug() << reply->readAll().size() << reply->error();
     ResultType result = Success;
     qDebug() << "finished";
     return result;
@@ -35,9 +35,16 @@ CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
 
 void GeneralNetworkWorker::receivePayload(QNetworkReply *reply)
 {
- //   text += "ok";
+    text += "ok";
     total += reply->readAll().size();
     count++;
-    if (count % 100 == 0)
+    if (count % 1 == 0)
         qDebug() << count << ":" << total;// << text;
+}
+
+
+CapricornWorker *GeneralNetworkWorkerFactory::createInstance()
+{
+    qDebug() << "I know";
+    return new GeneralNetworkWorker;
 }

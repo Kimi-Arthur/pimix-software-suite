@@ -8,6 +8,8 @@ QT       -= gui
 
 QT += network
 
+CONFIG += C++11
+
 TARGET = GeneralNetworkWorker
 TEMPLATE = lib
 

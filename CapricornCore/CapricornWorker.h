@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include "capricorncore_global.h"
 
+
 class CAPRICORNCORESHARED_EXPORT CapricornWorker
 {
 public:
@@ -22,8 +23,22 @@ public:
     virtual QString progressText() = 0;
 };
 
+
 #define CapricornWorker_iid "org.Pimix.Capricorn.Worker"
 
 Q_DECLARE_INTERFACE(CapricornWorker, CapricornWorker_iid)
+
+
+
+class CAPRICORNCORESHARED_EXPORT CapricornWorkerFactory
+{
+public:
+    virtual CapricornWorker *createInstance() = 0;
+    virtual void destroyInstance(CapricornWorker *workerInstance) = 0;
+};
+
+#define CapricornWorkerFactory_iid "org.Pimix.Capricorn.WorkerFactory"
+
+Q_DECLARE_INTERFACE(CapricornWorkerFactory, CapricornWorkerFactory_iid)
 
 #endif // CAPRICORNWORKER_H

@@ -19,12 +19,13 @@ int main(int argc, char *argv[])
         QJsonObject command = QJsonDocument::fromJson(rawCommand.toUtf8()).object();
         qDebug() << command;
         //qDebug() << "C:/Users/jingbian/Projects/Capricorn/bin/" + command["uri"].toString() + ".dll";
-        QPluginLoader loader("C:/Users/jingbian/Projects/Capricorn/bin/GeneralNetworkWorker.dll");
+        QPluginLoader loader("GeneralNetworkWorker.dll");
         qDebug() << loader.load();
         QObject *a = loader.instance();
         qDebug() << "Object:" << a;
-        CapricornWorker *b = qobject_cast<CapricornWorker *>(a);
-        qDebug() << b->startJob(command);
+        CapricornWorkerFactory *b = qobject_cast<CapricornWorkerFactory *>(a);
+        auto *c = b->createInstance();
+        qDebug() << c->startJob(command);
         qDebug() << loader.metaData();
     }
 }

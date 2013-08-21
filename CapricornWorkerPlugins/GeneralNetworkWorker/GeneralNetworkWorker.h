@@ -14,7 +14,7 @@
 class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public QObject, public BaseCapricornWorker
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID GeneralNetworkWorker_iid)
+//    Q_PLUGIN_METADATA(IID GeneralNetworkWorker_iid)
     Q_INTERFACES(CapricornWorker)
 public:
     GeneralNetworkWorker();
@@ -25,6 +25,18 @@ public:
     QNetworkAccessManager m;
 public slots:
     void receivePayload(QNetworkReply *reply);
+};
+
+#define GeneralNetworkWorkerFactory_iid "org.Pimix.Capricorn.WorkerFactory.GeneralNetwork"
+
+class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorkerFactory : public QObject, public BaseCapricornWorkerFactory
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID GeneralNetworkWorkerFactory_iid)
+    Q_INTERFACES(CapricornWorkerFactory)
+public:
+    CapricornWorker *createInstance();
+
 };
 
 #endif // GENERALNETWORKWORKER_H

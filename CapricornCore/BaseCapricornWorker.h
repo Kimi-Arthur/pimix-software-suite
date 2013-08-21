@@ -23,4 +23,13 @@ public:
     virtual QString progressText();
 };
 
+class CAPRICORNCORESHARED_EXPORT BaseCapricornWorkerFactory : public CapricornWorkerFactory
+{
+public:
+    virtual CapricornWorker *createInstance();
+    virtual void destroyInstance(CapricornWorker *workerInstance);
+protected:
+    QList<CapricornWorker *> workerInstances;
+};
+
 #endif // BASECAPRICORNWORKER_H

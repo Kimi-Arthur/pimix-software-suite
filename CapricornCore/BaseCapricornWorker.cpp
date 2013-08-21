@@ -45,5 +45,17 @@ int BaseCapricornWorker::progressMaximum()
 
 QString BaseCapricornWorker::progressText()
 {
-    return Success;
+    return "";
+}
+
+
+CapricornWorker *BaseCapricornWorkerFactory::createInstance()
+{
+    qDebug() << "You need to implement createInstance method!";
+    return nullptr;
+}
+
+void BaseCapricornWorkerFactory::destroyInstance(CapricornWorker *workerInstance)
+{
+    Q_ASSERT(workerInstances.removeAll(workerInstance) == 1);
 }
