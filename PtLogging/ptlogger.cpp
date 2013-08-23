@@ -1,9 +1,10 @@
 #include "ptlogger.h"
 
-PtLogger::PtLogger(QObject *parent) :
-    QObject(parent)
+PtLogger::PtLogger()
 {
     setLogPattern("[{time}][{type}]{content}\n");
+    outputFile->open(stdout, QIODevice::Append);
+    outputStream.setDevice(outputFile);
 }
 
 void PtLogger::log(QStringList content, QString type)
@@ -13,18 +14,29 @@ void PtLogger::log(QStringList content, QString type)
         {"type", type},
         {"content", content.join(" ")}
     };
-    QString result = logPattern();
+    QString result = getLogPattern();
     foreach (auto parameter, parameters)
         result.replace("{" + parameter.first + "}", parameter.second);
-    outputStream()->wr
+    outputStream << result << endl;
+}
 
-            QTextStream *PtLogger::outputFile() const
-    {
-        return m_outputStream;
-    }
+void PtLogger::setOutputStream(const QString &value)
+{
+    outputFile->close();
+    outputFile->deleteLater();
+    outputFile = new QFile(value);
+    if (!outputFile->open(QIODevice::Append)) // Value.isEmpty() is implied
+        outputFile->open(stdout, QIODevice::Append);
+    outputStream.setDevice(outputFile);
+}
 
-    void PtLogger::setOutputFile(QTextStream *outputFile)
-    {
-        m_outputStream = outputFile;
-    }
+
+QString PtLogger::getLogPattern() const
+{
+    return logPattern;
+}
+
+void PtLogger::setLogPattern(const QString &value)
+{
+    logPattern = value;
 }
