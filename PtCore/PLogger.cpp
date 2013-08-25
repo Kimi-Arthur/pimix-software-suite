@@ -5,7 +5,18 @@
 PLogger::PLogger()
 {
     logPattern = DefaultLogPattern;
+    for (int t = InformationLog; t <= FatalLog; ++t)
+        logFileNamePattern.insert(static_cast<LogType>(t), {DefaultLogFileNamePattern + ".log"});
+    logFileNamePattern.insert(DebugLog, {DefaultLogFileNamePattern + "-debug.log"});
+    displayBound = DefaultDisplayBound;
 }
+
+PLogger::PLogger(QPluginLoader &loader) :
+    PLogger()
+{
+
+}
+
 
 void PLogger::log(QString content, PLogger::LogType logType) const
 {
@@ -55,7 +66,7 @@ void PLogger::displayLog(QString resultLog, PLogger::LogType logType) const
 
 void PLogger::writeLog(QString resultLog, PLogger::LogType logType) const
 {
-    foreach (auto fileName, logFileMapping.value(logType)) {
+    foreach (auto fileName, logFileNamePattern.value(logType)) {
         QFile file(fileName);
         if (file.open(QIODevice::Append | QIODevice::Text)) {
             QTextStream stream(&file);
