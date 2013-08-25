@@ -5,11 +5,12 @@
 #include <QSet>
 #include <QString>
 #include <QDateTime>
+#include "ptcore_global.h"
+#include <QPluginLoader>
 
-class PLogger
+class PTCORESHARED_EXPORT PLogger
 {
 public:
-    PLogger();
     // Public Types
     enum LogType {
         DebugLog, InformationLog, WarningLog, ErrorLog, FatalLog
@@ -18,14 +19,18 @@ public:
     // Public Constants
     const QMap<LogType, QString> LogStrings = {{DebugLog, "DEBUG"}, {InformationLog, "INFO"}, {WarningLog, "WARN"}, {ErrorLog, "ERROR"}, {FatalLog, "FATAL"}};
     const QString DefaultLogPattern = "[{time}][{type}]{content}";
+    const QString DefaultLogFileNamePattern = "{base_path}/{iid}-{date}";
+    const LogType DefaultDisplayBound = InformationLog;
 
     // Public Data Memebers
-    QString logPattern;
-    // Controls what log info will be displayed.
-    LogType displayBound;
+    QString logPattern; // What the logs contain.
+    LogType displayBound; // Which logs will be displayed.
+    QMap<LogType, QSet<QString>> logFileNamePattern; // What the log files' names are.
+    QMap<QString, QString> generalParamters; // Customized fill-in parameters.
 
-    QMap<LogType, QSet<QString>> logFileMapping;
-
+    // Public Constructors
+    PLogger();
+    PLogger(QPluginLoader &loader);
 
     // Public Methods
     void log(QString content, LogType logType) const;
