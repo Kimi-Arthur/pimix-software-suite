@@ -28,6 +28,7 @@ class CAPRICORNCORESHARED_EXPORT BaseCapricornWorkerFactory : public CapricornWo
 public:
     virtual CapricornWorker *createInstance();
     virtual void destroyInstance(CapricornWorker *workerInstance);
+
 protected:
     QList<CapricornWorker *> workerInstances;
 };

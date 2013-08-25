@@ -2,6 +2,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QEventLoop>
+#include "PLogger.h"
 
 GeneralNetworkWorker::GeneralNetworkWorker()
 {
@@ -10,6 +11,7 @@ GeneralNetworkWorker::GeneralNetworkWorker()
 
 CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
 {
+    PLogger logger;
     qDebug() << jobInfo["path"].toString();
     //text = jobInfo["path"].toString();
     qDebug() << "b";

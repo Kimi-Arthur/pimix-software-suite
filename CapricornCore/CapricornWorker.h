@@ -1,9 +1,11 @@
 #ifndef CAPRICORNWORKER_H
 #define CAPRICORNWORKER_H
 
+#include <QDebug>
 #include <QObject>
 #include <QString>
 #include <QJsonObject>
+#include "PLogger.h"
 #include "capricorncore_global.h"
 
 
@@ -13,6 +15,7 @@ public:
     typedef enum {
         Success, Failure
     } ResultType;
+    //virtual CapricornWorker(PLogger logger) = 0;
     virtual ResultType startJob(QJsonObject jobInfo=QJsonObject()) = 0;
     virtual ResultType stopJob() = 0;
     virtual ResultType pauseJob() = 0;
@@ -33,8 +36,10 @@ Q_DECLARE_INTERFACE(CapricornWorker, CapricornWorker_iid)
 class CAPRICORNCORESHARED_EXPORT CapricornWorkerFactory
 {
 public:
-    virtual CapricornWorker *createInstance() = 0;
+    CapricornWorkerFactory(QString test) {qDebug() << test;}
+    virtual CapricornWorker *createInstance(PLogger logger) = 0;
     virtual void destroyInstance(CapricornWorker *workerInstance) = 0;
+    virtual ~CapricornWorkerFactory() = 0;
 };
 
 #define CapricornWorkerFactory_iid "org.Pimix.Capricorn.WorkerFactory"

@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
         rawCommand = input.readLine();
         QJsonObject command = QJsonDocument::fromJson(rawCommand.toUtf8()).object();
         qDebug() << command;
-        //qDebug() << "C:/Users/jingbian/Projects/Capricorn/bin/" + command["uri"].toString() + ".dll";
-        QPluginLoader loader("GeneralNetworkWorker.dll");
+        //qDebug() << "../bin/" + command["uri"].toString() + ".dll";
+        QPluginLoader loader("C:/Users/Kimi/Documents/Projects/Capricorn/bin/GeneralNetworkWorker.dll");
         qDebug() << loader.load();
         QObject *a = loader.instance();
         qDebug() << "Object:" << a;

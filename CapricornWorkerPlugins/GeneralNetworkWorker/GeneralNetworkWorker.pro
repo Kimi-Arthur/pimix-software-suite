@@ -37,3 +37,10 @@ else:unix: LIBS += -L$$OUT_PWD/../../CapricornCore/ -lCapricornCore
 
 INCLUDEPATH += $$PWD/../../CapricornCore
 DEPENDPATH += $$PWD/../../CapricornCore
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../Library/PtCore/release/ -lPtCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../Library/PtCore/debug/ -lPtCore
+else:unix: LIBS += -L$$OUT_PWD/../../../Library/PtCore/ -lPtCore
+
+INCLUDEPATH += $$PWD/../../../Library/PtCore
+DEPENDPATH += $$PWD/../../../Library/PtCore
