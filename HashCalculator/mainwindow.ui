@@ -112,7 +112,7 @@
          <widget class="QWidget" name="page_3">
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="FileChooserWidget" name="fileWidget" native="true">
+            <widget class="PFileChooserWidget" name="fileWidget" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -198,9 +198,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>FileChooserWidget</class>
+   <class>PFileChooserWidget</class>
    <extends>QWidget</extends>
-   <header>filechooserwidget.h</header>
+   <header>PFileChooserWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

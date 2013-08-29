@@ -1,7 +1,12 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "MainWindow.h"
+#include "ui_MainWindow.h"
 #include "ptnetwork.h"
+#include <QJsonDocument>
 #include <QDebug>
+#include <QSharedPointer>
+#include <QMessageBox>
+#include <QFile>
+#include "PFileChooserWidget.h"
 
 // Local functions
 
@@ -20,13 +25,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(receiveReply(QNetworkReply*)));
-    manager.setCookieJar(&cookieJar);
     ui->setupUi(this);
+    connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(receiveReply(QNetworkReply*)));
+    connect(&manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(login(QNetworkReply*,QAuthenticator*)));
+    manager.setCookieJar(&cookieJar);
+    connect(ui->hexModeRadio, &QRadioButton::toggled, [=](bool state){if (state) ui->stackedWidget->setCurrentIndex(0);});
+    connect(ui->rawModeRadio, &QRadioButton::toggled, [=](bool state){if (state) ui->stackedWidget->setCurrentIndex(0);});
+    connect(ui->fileModeRadio, &QRadioButton::toggled, [=](bool state){if (state) ui->stackedWidget->setCurrentIndex(1);});
 }
 
 MainWindow::~MainWindow()
 {
+    //PSettings.save(this);
     delete ui;
 }
 
@@ -37,16 +47,23 @@ void MainWindow::on_requestButton_clicked()
     QString method = ui->methodCombo->currentText();
     QString rawData = ui->dataEdit->toPlainText();
     QByteArray data;
-    if (ui->rawModeButton->isChecked())
+    if (ui->rawModeRadio->isChecked())
         data = rawData.toUtf8();
     if (ui->hexModeRadio->isChecked()) {
         rawData = rawData.toUpper().remove(QRegularExpression("[^0-9A-F]"));
         for (int i = 0; i < rawData.size(); i += 2)
             data += rawData.mid(i, 2).toInt(0, 16);
     }
-    if (ui->fileModeButton->isChecked()) {
-        data = "";
+    QFile *f;
+    if (ui->fileModeRadio->isChecked()) {
+        qDebug() << ui->fileNameEdit->getPath();
+        f = new QFile(ui->fileNameEdit->getPath());
+        if (f->open(QIODevice::ReadOnly))
+            qDebug() << "OK";
+        qDebug() << f->errorString();
     }
+
+    qDebug() << data.size();
 
     foreach (auto cookie, cookieJar.cookiesForUrl(hostname))
         cookieJar.deleteCookie(cookie);
@@ -63,20 +80,25 @@ void MainWindow::on_requestButton_clicked()
 
     manager.setProxy(Pt::getProxy(ui->proxyLine->text()));
     qDebug() << manager.proxy();
+    auto request = QNetworkRequest(url);
+    request.setRawHeader("Authorization", "Basic a2ltaS5yaWJlcnlAZ21haWwuY29tOmU2R0VveVFKdmhvbkswS3YvUGpDNCtNZUdUczlOTFFQZWdYWWJCdWJmN1U=");
 
     if (method == "GET")
-        manager.get(QNetworkRequest(url));
+        manager.get(request);
     if (method == "POST") {
-        manager.post(QNetworkRequest(url), data);
+        manager.post(request, data);
     }
-    if (method == "PUT")
-        manager.put(QNetworkRequest(url), data);
+    if (method == "PUT") {
+        request.setRawHeader("X-CEVALTOKEN", "5Dm6jD4tz1XYwA2UyDF4uQ773Y2B9zzNAAABP8YyoPgI9Mk_47TAjMpkVc70F-fFkyromg");
+        manager.put(request, f);
+    }
     if (method == "DELETE")
-        manager.deleteResource(QNetworkRequest(url));
+        manager.deleteResource(request);
 }
 
 void MainWindow::receiveReply(QNetworkReply *reply)
 {
+    QMessageBox::information(this, "Success", "Reply received!");
     QByteArray content = reply->readAll();
     qDebug() << content;
     ui->rawOutput->clear();
@@ -99,5 +121,13 @@ void MainWindow::receiveReply(QNetworkReply *reply)
     ui->htmlOutput->setHtml(content);
     ui->hexStreamOutput->setText(hexContent.toUpper());;
     ui->rawStreamOutput->setText(content);
+    ui->jsonOutput->setText(QJsonDocument::fromJson(content).toJson());
     reply->deleteLater();
+}
+
+void MainWindow::login(QNetworkReply *reply, QAuthenticator *auther)
+{
+    qDebug() << "Authing";
+    auther->setUser(ui->usernameLine->text());
+    auther->setPassword(ui->passwordLine->text());
 }
