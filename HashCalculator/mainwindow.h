@@ -6,7 +6,7 @@
 #include <QRegularExpression>
 #include <QLineEdit>
 #include <QFormLayout>
-#include "filechooserwidget.h"
+#include "PFileChooserWidget.h"
 
 namespace Ui {
 class MainWindow;

@@ -9,6 +9,7 @@
 #include <QNetworkCookieJar>
 #include <QNetworkCookie>
 #include <QNetworkProxy>
+#include <QAuthenticator>
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,7 @@ public:
 private slots:
     void on_requestButton_clicked();
     void receiveReply(QNetworkReply* reply);
+    void login(QNetworkReply* reply, QAuthenticator* auther);
 
 private:
     Ui::MainWindow *ui;

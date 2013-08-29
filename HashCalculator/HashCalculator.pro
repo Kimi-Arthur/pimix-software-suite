@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = HashCalculator
 TEMPLATE = app
 
+DESTDIR = $$DEST_BASE
 
 SOURCES += main.cpp\
         mainwindow.cpp

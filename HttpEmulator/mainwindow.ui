@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>487</height>
+    <width>931</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>HTTP Emulator</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -21,9 +21,6 @@
        <string>Request</string>
       </property>
       <layout class="QFormLayout" name="formLayout">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
@@ -34,7 +31,14 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="uriLine">
          <property name="text">
-          <string>http://svr.xlpan.com/userInfo/login?peerId=002100390AB3K4QE&amp;intranetIp=192%2E169%2E0%2E105&amp;computerName=&amp;type=client&amp;needBetaAuth=1&amp;onlyjson=1&amp;protocol=120211</string>
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Method:</string>
          </property>
         </widget>
        </item>
@@ -68,41 +72,21 @@
          </item>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QPlainTextEdit" name="dataEdit">
-         <property name="plainText">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Use Proxy:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="proxyLine">
+         <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Cookies:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QPlainTextEdit" name="cookieEdit">
-         <property name="plainText">
-          <string>userid=21473758; jumpkey=B32BDA899E483488086A36B4EBFC9AFAAA8C1681B9181CD4F4E01F1F63EC9CB897A14DC0EE1B06FD29EB18D33E69AD0747118B2F732AB5864B8A88CEBC722A422957CDD85384897298C1923A7CBDC8E7; clientsessionid=E79FA6D38191D617F2E4C9EE1783C782; clientoperationid=20; clienttype=pc; clientversion=3.1.2.2; peerid=002100390AB3K4QE</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QPushButton" name="requestButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Request!</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <property name="spacing">
           <number>0</number>
@@ -126,48 +110,134 @@
             <string>Hex Mode</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="rawModeButton">
-           <property name="text">
-            <string>Raw Mode</string>
-           </property>
-           <property name="checked">
             <bool>false</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="fileModeButton">
+          <widget class="QRadioButton" name="rawModeRadio">
+           <property name="text">
+            <string>Raw Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="fileModeRadio">
            <property name="text">
             <string>File Mode</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Method:</string>
+          <string>Cookies:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="proxyLine">
-         <property name="text">
-          <string>proxy-prc.intel.com:911</string>
+       <item row="5" column="1">
+        <widget class="QPlainTextEdit" name="cookieEdit">
+         <property name="plainText">
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_5">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Use Proxy:</string>
+          <string>Username:</string>
          </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="usernameLine">
+         <property name="text">
+          <string>kimi.ribery@gmail.com</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Password:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="passwordLine">
+         <property name="text">
+          <string>e6GEoyQJvhonK0Kv/PjC4+MeGTs9NLQPegXYbBubf7U</string>
+         </property>
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QPushButton" name="requestButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Request!</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QStackedWidget" name="stackedWidget">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <widget class="QWidget" name="page">
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPlainTextEdit" name="dataEdit">
+             <property name="plainText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page_2">
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="PFileChooserWidget" name="fileNameEdit" native="true"/>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -182,7 +252,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab_3">
           <attribute name="title">
@@ -234,6 +304,16 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_6">
+          <attribute name="title">
+           <string>JSON</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QTextBrowser" name="jsonOutput"/>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -246,7 +326,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>820</width>
+     <width>931</width>
      <height>26</height>
     </rect>
    </property>
@@ -262,6 +342,31 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>PFileChooserWidget</class>
+   <extends>QWidget</extends>
+   <header>PFileChooserWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>uriLine</sender>
+   <signal>returnPressed()</signal>
+   <receiver>requestButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>165</x>
+     <y>513</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
