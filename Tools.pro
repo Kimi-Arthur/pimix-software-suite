@@ -3,4 +3,5 @@ TEMPLATE = subdirs
 SUBDIRS += \
     ../Library \
     HttpEmulator \
-    HashCalculator
+    HashCalculator \
+    FileScissors
