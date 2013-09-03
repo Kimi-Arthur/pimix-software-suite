@@ -6,6 +6,8 @@
 
 QT       -= gui
 
+CONFIG += C++11
+
 TARGET = PtCore
 TEMPLATE = lib
 
