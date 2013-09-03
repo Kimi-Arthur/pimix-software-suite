@@ -9,14 +9,20 @@ QT       -= gui
 TARGET = PtCore
 TEMPLATE = lib
 
+CONFIG += C++11
+
 DEFINES += PTCORE_LIBRARY
 
 SOURCES += PtCore.cpp \
-    PSettings.cpp
+    PSettings.cpp \
+    PFile.cpp \
+    PConsole.cpp
 
 HEADERS += PtCore.h\
         ptcore_global.h \
-    PSettings.h
+    PSettings.h \
+    PFile.h \
+    PConsole.h
 
 unix:!symbian {
     maemo5 {
