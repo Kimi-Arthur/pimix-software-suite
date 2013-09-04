@@ -45,7 +45,7 @@ void GeneralNetworkWorker::receivePayload(QNetworkReply *reply)
 }
 
 
-CapricornWorker *GeneralNetworkWorkerFactory::createInstance()
+CapricornWorker *GeneralNetworkWorkerFactory::createInstance(PLogger logger)
 {
     qDebug() << "I know";
     return new GeneralNetworkWorker;

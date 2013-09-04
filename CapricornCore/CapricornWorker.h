@@ -5,9 +5,8 @@
 #include <QObject>
 #include <QString>
 #include <QJsonObject>
-#include "PLogger.h"
 #include "capricorncore_global.h"
-
+#include "PLogger.h"
 
 class CAPRICORNCORESHARED_EXPORT CapricornWorker
 {
@@ -36,10 +35,11 @@ Q_DECLARE_INTERFACE(CapricornWorker, CapricornWorker_iid)
 class CAPRICORNCORESHARED_EXPORT CapricornWorkerFactory
 {
 public:
+    CapricornWorkerFactory() {}
     CapricornWorkerFactory(QString test) {qDebug() << test;}
     virtual CapricornWorker *createInstance(PLogger logger) = 0;
     virtual void destroyInstance(CapricornWorker *workerInstance) = 0;
-    virtual ~CapricornWorkerFactory() = 0;
+    virtual ~CapricornWorkerFactory() {}
 };
 
 #define CapricornWorkerFactory_iid "org.Pimix.Capricorn.WorkerFactory"

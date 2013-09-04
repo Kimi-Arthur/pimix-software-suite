@@ -15,7 +15,7 @@ class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorker : public QObject, p
 {
     Q_OBJECT
 //    Q_PLUGIN_METADATA(IID GeneralNetworkWorker_iid)
-    Q_INTERFACES(CapricornWorker)
+//    Q_INTERFACES(CapricornWorker)
 public:
     GeneralNetworkWorker();
     ResultType download(QJsonObject jobInfo);
@@ -33,7 +33,12 @@ class GENERALNETWORKWORKERSHARED_EXPORT GeneralNetworkWorkerFactory : public QOb
     Q_PLUGIN_METADATA(IID GeneralNetworkWorker_iid)
     Q_INTERFACES(CapricornWorkerFactory)
 public:
-    CapricornWorker *createInstance();
+    GeneralNetworkWorkerFactory() {}
+    GeneralNetworkWorkerFactory(QString test) {
+        qDebug() << test << "gnw";
+    }
+
+    CapricornWorker *createInstance(PLogger logger);
 
 };
 
