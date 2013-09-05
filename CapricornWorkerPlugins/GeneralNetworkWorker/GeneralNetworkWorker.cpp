@@ -11,7 +11,7 @@ GeneralNetworkWorker::GeneralNetworkWorker()
 
 CapricornWorker::ResultType GeneralNetworkWorker::download(QJsonObject jobInfo)
 {
-    PLogger logger;
+    //PLogger logger;
     qDebug() << jobInfo["path"].toString();
     //text = jobInfo["path"].toString();
     qDebug() << "b";

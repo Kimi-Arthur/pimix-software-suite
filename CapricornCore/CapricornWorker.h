@@ -15,7 +15,7 @@ public:
         Success, Failure
     } ResultType;
     //virtual CapricornWorker(PLogger logger) = 0;
-    virtual ResultType startJob(QJsonObject jobInfo=QJsonObject()) = 0;
+    virtual ResultType startJob(QJsonObject jobInfo = QJsonObject()) = 0;
     virtual ResultType stopJob() = 0;
     virtual ResultType pauseJob() = 0;
     virtual ResultType resumeJob() = 0;
