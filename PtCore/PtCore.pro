@@ -16,13 +16,17 @@ DEFINES += PTCORE_LIBRARY
 SOURCES += PtCore.cpp \
     PSettings.cpp \
     PFile.cpp \
-    PConsole.cpp
+    PConsole.cpp \
+    PLogger.cpp \
+    PJsonValue.cpp
 
 HEADERS += PtCore.h\
         ptcore_global.h \
     PSettings.h \
     PFile.h \
-    PConsole.h
+    PConsole.h \
+    PLogger.h \
+    PJsonValue.h
 
 unix:!symbian {
     maemo5 {
