@@ -2,8 +2,7 @@
 #define PJSONVALUE_H
 
 #include "ptcore_global.h"
-
-class QJsonValue;
+#include <QJsonValue>
 
 class PJsonValueRef;
 

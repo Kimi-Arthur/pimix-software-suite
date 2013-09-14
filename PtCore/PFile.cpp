@@ -55,7 +55,9 @@ int PFile::splitFile(QString inputFileName, QList<QPair<QString, qint64> > outpu
         }
         qint64 blockCount = (info.second - 1) / BlockSize + 1;
         for (qint64 i = 0; i < blockCount; ++i) {
-            outputFile.write(inputFile.read(qMin(BlockSize, info.second - i * BlockSize)));
+            // TODO: Bug workaround for MinGW Debug
+            qint64 s1 = BlockSize;
+            outputFile.write(inputFile.read(qMin(s1, info.second - i * BlockSize)));
             outputFile.flush();
         }
         outputFile.close();
