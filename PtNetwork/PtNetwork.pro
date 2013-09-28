@@ -15,11 +15,10 @@ TEMPLATE = lib
 
 DEFINES += PTNETWORK_LIBRARY
 
-SOURCES += ptnetwork.cpp
+SOURCES += PtNetwork.cpp
 
-HEADERS += ptnetwork.h\
-        PtNetwork_global.h \
-    PNetworkTask.h
+HEADERS += PtNetwork.h\
+        PtNetwork_global.h
 
 unix:!symbian {
     maemo5 {
