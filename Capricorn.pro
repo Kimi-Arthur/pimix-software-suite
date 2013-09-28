@@ -4,4 +4,5 @@ SUBDIRS += \
     ..\Library \
     CapricornCore \
     CapricornWorkerPlugins \
-    ConsoleCapricornRunner
+    ConsoleCapricornRunner \
+    BaiduCloudConsole
