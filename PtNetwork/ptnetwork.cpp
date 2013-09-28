@@ -1,4 +1,4 @@
-#include "ptnetwork.h"
+#include "PtNetwork.h"
 
 
 QNetworkProxy Pt::getProxy(const QString &proxyString)

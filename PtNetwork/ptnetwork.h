@@ -8,6 +8,18 @@
 
 namespace Pt {
 PTNETWORKSHARED_EXPORT QNetworkProxy getProxy(const QString &proxyString);
+enum class HttpVerb
+{
+    Get,
+    Head,
+    Post,
+    Put,
+    Delete,
+    Trace,
+    Options,
+    Connect,
+    Patch
+};
 }
 
 #endif // PTNETWORK_H
