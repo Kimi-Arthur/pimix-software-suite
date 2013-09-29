@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QDebug>
 #include <QPluginLoader>
-#include "PLogger.h"
+#include "PMessageLogger.h"
 #include "CapricornWorker.h"
 
 int main(int argc, char *argv[])
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         QObject *a = loader.instance();
         qDebug() << "Object:" << a;
         CapricornWorkerFactory *b = qobject_cast<CapricornWorkerFactory *>(a);
-        auto *c = b->createInstance(PLogger());
+        auto *c = b->createInstance(Pt::Core::PMessageLogger());
         qDebug() << c->startJob(command);
         qDebug() << loader.metaData();
     }

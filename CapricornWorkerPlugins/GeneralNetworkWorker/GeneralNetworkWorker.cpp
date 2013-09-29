@@ -2,7 +2,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QEventLoop>
-#include "PLogger.h"
+#include "PMessageLogger.h"
 
 GeneralNetworkWorker::GeneralNetworkWorker()
 {
@@ -45,7 +45,7 @@ void GeneralNetworkWorker::receivePayload(QNetworkReply *reply)
 }
 
 
-CapricornWorker *GeneralNetworkWorkerFactory::createInstance(PLogger logger)
+CapricornWorker *GeneralNetworkWorkerFactory::createInstance(Pt::Core::PMessageLogger logger)
 {
     qDebug() << "I know";
     return new GeneralNetworkWorker;

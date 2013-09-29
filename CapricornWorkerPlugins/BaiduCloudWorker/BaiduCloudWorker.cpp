@@ -10,7 +10,7 @@
 
 BaiduCloudWorker::BaiduCloudWorker()
 {
-    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
+    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(6000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
         return;
