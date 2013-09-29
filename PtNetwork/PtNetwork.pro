@@ -15,10 +15,14 @@ TEMPLATE = lib
 
 DEFINES += PTNETWORK_LIBRARY
 
-SOURCES += PtNetwork.cpp
+SOURCES += PtNetwork.cpp \
+    PNetworkAccessManager.cpp \
+    PNetworkRetryPolicy.cpp
 
 HEADERS += PtNetwork.h\
-        PtNetwork_global.h
+        PtNetwork_global.h \
+    PNetworkAccessManager.h \
+    PNetworkRetryPolicy.h
 
 unix:!symbian {
     maemo5 {

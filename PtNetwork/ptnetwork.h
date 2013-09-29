@@ -6,7 +6,10 @@
 #include <QString>
 #include <QRegularExpression>
 
+
 namespace Pt {
+namespace Network {
+
 PTNETWORKSHARED_EXPORT QNetworkProxy getProxy(const QString &proxyString);
 enum class HttpVerb
 {
@@ -20,6 +23,8 @@ enum class HttpVerb
     Connect,
     Patch
 };
+
+}
 }
 
 #endif // PTNETWORK_H
