@@ -10,6 +10,7 @@
 
 BaiduCloudWorker::BaiduCloudWorker()
 {
+    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
         return;
@@ -45,7 +46,7 @@ CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
         {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
     };
 
-    executeHttpRequest(Pt::HttpVerb::Post, settings["RemovePath"].toObject()["UrlPattern"].toString(), parameters);
+    manager->executeNetworkRequest(HttpVerb::Post, settings["RemovePath"].toObject()["UrlPattern"].toString(), parameters);
     ResultType result = Success;
     qDebug() << "finished";
     return result;
@@ -75,7 +76,7 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileDirect(QString remotePat
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return Failure;
-    executeHttpRequest(Pt::HttpVerb::Put, settings["UploadFileDirect"].toObject()["UrlPattern"].toString(), parameters, fileToUpload.readAll());
+    manager->executeNetworkRequest(HttpVerb::Put, settings["UploadFileDirect"].toObject()["UrlPattern"].toString(), parameters, fileToUpload.readAll());
 
     ResultType result = Success;
     qDebug() << "finished";
@@ -90,11 +91,14 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlock(QString remotePa
     QStringList blockHashList;
     QByteArray data = fileToUpload.read(baseBlockSize);
     qDebug() << "Start";
+    bool ok = true;
     while (!data.isEmpty()) {
         bc = 0;
         blockHashList.append(uploadBlock(data));
-        //executeHttpRequest(Pt::HttpVerb::Get, "http://www.baidu.com");
-        qDebug() << blockHashList << blockHashList.count();
+        ok = ok && !blockHashList.back().isEmpty();
+        qDebug() << QDateTime::currentDateTime();
+        qDebug() << blockHashList.count() << ok;
+        qDebug() << blockHashList;
         data = fileToUpload.read(baseBlockSize);
     }
     return mergeBlocks(remotePath, blockHashList);
@@ -105,8 +109,10 @@ QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
     std::map<QString, QString> parameters = {
         {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
     };
-    QJsonObject blockUploadResult = QJsonDocument::fromJson(executeHttpRequest(Pt::HttpVerb::Put,
-                                                                               settings["UploadBlock"].toObject()["UrlPattern"].toString(), parameters, data)).object();
+    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Put,
+                                                          settings["UploadBlock"].toObject()["UrlPattern"].toString(), parameters, data);
+    QJsonObject blockUploadResult = QJsonDocument::fromJson(reply->readAll()).object();
+    reply->deleteLater();
     return blockUploadResult["md5"].toString();
 }
 
@@ -119,51 +125,9 @@ CapricornWorker::ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QS
     };
     QJsonObject param;
     param["block_list"] = QJsonArray::fromStringList(blockHashList);
-    executeHttpRequest(Pt::HttpVerb::Post, settings["MergeBlocks"].toObject()["UrlPattern"].toString(), parameters , QByteArray("param=") + QJsonDocument(param).toJson());
+    manager->executeNetworkRequest(HttpVerb::Post, settings["MergeBlocks"].toObject()["UrlPattern"].toString(), parameters , QByteArray("param=") + QJsonDocument(param).toJson());
 
     ResultType result = Success;
     qDebug() << "finished";
     return result;
 }
-
-QByteArray BaiduCloudWorker::executeHttpRequest(Pt::HttpVerb verb, QString urlPattern, std::map<QString, QString> parameters, const QByteArray &data)
-{
-    for (auto parameter : parameters)
-        urlPattern.replace(QString("{%1}").arg(parameter.first), parameter.second);
-    QNetworkReply *reply;
-    switch (verb) {
-    case Pt::HttpVerb::Get:
-        reply = manager->get(QNetworkRequest(urlPattern));
-        break;
-    case Pt::HttpVerb::Post:
-        reply = manager->post(QNetworkRequest(urlPattern), data);
-        break;
-    case Pt::HttpVerb::Put:
-        reply = manager->put(QNetworkRequest(urlPattern), data);
-        break;
-    case Pt::HttpVerb::Head:
-    case Pt::HttpVerb::Delete:
-    case Pt::HttpVerb::Trace:
-    case Pt::HttpVerb::Options:
-    case Pt::HttpVerb::Connect:
-    case Pt::HttpVerb::Patch:
-    default:
-        break;
-    }
-    int i = 0;
-    forever {
-        qDebug() << QString("Tried %1 times").arg(i++);
-        QEventLoop loop;
-        QTimer timer;
-        connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-        connect(reply, &QNetworkReply::uploadProgress, this, &BaiduCloudWorker::showProgress);
-        connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-        timer.start(600000);
-        loop.exec();
-        if (timer.isActive())
-            break;
-    }
-    reply->deleteLater();
-    return reply->readAll();
-}
-

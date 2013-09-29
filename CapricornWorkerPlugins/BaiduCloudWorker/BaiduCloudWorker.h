@@ -11,6 +11,9 @@
 #include "BaseCapricornWorker.h"
 #include "PtNetwork.h"
 #include "map"
+#include "PNetworkAccessManager.h"
+
+using namespace Pt::Network;
 
 class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject, public BaseCapricornWorker
 {
@@ -21,7 +24,7 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject, public Ba
     static const qint64 maxBlockSize = 2 * PFile::GigabyteSize;
     static const qint64 maxBlockCount = 1024;
     QJsonObject settings;
-    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    PNetworkAccessManager *manager = new PNetworkAccessManager();
     // Temp variables
     qint64 bc;
 public:
@@ -37,7 +40,6 @@ private:
     ResultType uploadFileByBlock(QString remotePath, QString localPath);
     QString uploadBlock(const QByteArray &data);
     ResultType mergeBlocks(QString remotePath, QStringList blockHashList);
-    QByteArray executeHttpRequest(Pt::HttpVerb verb, QString urlPattern, std::map<QString, QString> paramters = std::map<QString, QString>(), const QByteArray &data = QByteArray());
 };
 
 class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorkerFactory : public QObject, public BaseCapricornWorkerFactory
