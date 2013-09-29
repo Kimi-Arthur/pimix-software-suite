@@ -54,6 +54,7 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
         loop.exec();
         if (retryPolicy->validate(reply))
             break;
+        reply->deleteLater();
     }
     return reply;
 }
