@@ -17,16 +17,16 @@ SOURCES += PtCore.cpp \
     PSettings.cpp \
     PFile.cpp \
     PConsole.cpp \
-    PLogger.cpp \
-    PJsonValue.cpp
+    PJsonValue.cpp \
+    PMessageLogger.cpp
 
 HEADERS += PtCore.h\
         ptcore_global.h \
     PSettings.h \
     PFile.h \
     PConsole.h \
-    PLogger.h \
-    PJsonValue.h
+    PJsonValue.h \
+    PMessageLogger.h
 
 unix:!symbian {
     maemo5 {
