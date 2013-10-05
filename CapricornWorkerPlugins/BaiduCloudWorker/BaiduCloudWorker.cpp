@@ -6,11 +6,18 @@
 #include <QNetworkReply>
 #include <QtMath>
 #include <QJsonArray>
+#include <QPair>
 #include <QTimer>
+#include <QStringList>
+#include <QtConcurrent/QtConcurrent>
+#include "PMessageLogger.h"
+#include <tuple>
+#include "PMessageLogger.h"
 
 BaiduCloudWorker::BaiduCloudWorker()
 {
-    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(6000, 5));
+    qDebug() << "1" << Pt::Core::PMessageLogger::globalInstance()->logPattern;
+    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(6000000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
         return;
@@ -33,9 +40,9 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QSt
         return Failure;
     qint64 fileSize = f.size();
     f.close();
-    if (fileSize <= baseBlockSize)
+    if (fileSize <= BaseBlockSize)
         uploadFileDirect(remotePath, localPath);
-    else uploadFileByBlock(remotePath, localPath);
+    else uploadFileByBlockMultithread(remotePath, localPath);
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
@@ -62,7 +69,7 @@ void BaiduCloudWorker::showProgress(qint64 bs, qint64 bt)
 
 qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
 {
-    if (fileSize > maxBlockSize * maxBlockCount)
+    if (fileSize > MaxBlockSize * MaxBlockCount)
         return 0;
 }
 
@@ -83,13 +90,72 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileDirect(QString remotePat
     return result;
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlock(QString remotePath, QString localPath)
+CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QString localPath)
+{
+    QFile fileToUpload(localPath);
+    if (!fileToUpload.open(QIODevice::ReadOnly))
+        return Failure;
+    qint64 fileSize = fileToUpload.size();
+    //fileToUpload.close();
+    QList<QPair<qint64, qint64>> blockInformationList;
+    for (qint64 index = 0; index < fileSize; index += BaseBlockSize) {
+        // Temp workaround for MinGW bug
+        qint64 sizeA = BaseBlockSize, sizeB = fileSize - index;
+        blockInformationList.append({index, qMin(sizeA, sizeB)});
+    }
+
+    //QtConcurrent::blockingMapped(blockInformationList,
+    /**[&](QPair<qint64, qint64> bi)
+    {
+        QFile f;//(localPath);
+        f.open(QIODevice::ReadOnly);
+        f.seek(bi.first);
+        QByteArray data = f.read(bi.second);
+        f.close();
+        //return uploadBlock(data);
+    });*/
+
+    //QStringList blockHashList;
+
+    QByteArray data = fileToUpload.read(BaseBlockSize);
+    qDebug() << QStringList("Start");
+    bool ok = true;
+    // QList needn't be thread safe here.
+    // All operation to QList is done here in the same thread.
+    QList<QFuture<QString>> blockStatusList;
+    QList<QString> blockResultList;
+    while (!data.isEmpty()) {
+        bc = 0;
+        blockStatusList.append(QtConcurrent::run(this, &BaiduCloudWorker::uploadBlock, data));
+        while (blockStatusList.size() > MaxThreadCount) {
+            QFuture<QString> currentBlockStatus = blockStatusList.takeFirst();
+            currentBlockStatus.waitForFinished();
+            blockResultList.append(currentBlockStatus.result());
+            //Pt::Core::PMessageLogger::info(blockResultList);
+        }
+        qDebug() << "WIP" << blockStatusList.size() << "Done" << blockResultList.size();
+//        ok = ok && !blockHashList.back().isEmpty();
+        qDebug() << QDateTime::currentDateTime();
+//        qDebug() << blockHashList.count() << ok;
+        data = fileToUpload.read(BaseBlockSize);
+    }
+    while (!blockStatusList.isEmpty()) {
+        QFuture<QString> currentBlockStatus = blockStatusList.takeFirst();
+        currentBlockStatus.waitForFinished();
+        blockResultList.append(currentBlockStatus.result());
+        qDebug() << blockResultList;
+    }
+    return mergeBlocks(remotePath, blockResultList);
+}
+
+CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
 {
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return Failure;
     QStringList blockHashList;
-    QByteArray data = fileToUpload.read(baseBlockSize);
+
+    QByteArray data = fileToUpload.read(BaseBlockSize);
     qDebug() << "Start";
     bool ok = true;
     while (!data.isEmpty()) {
@@ -99,21 +165,39 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlock(QString remotePa
         qDebug() << QDateTime::currentDateTime();
         qDebug() << blockHashList.count() << ok;
         qDebug() << blockHashList;
-        data = fileToUpload.read(baseBlockSize);
+        data = fileToUpload.read(BaseBlockSize);
     }
     return mergeBlocks(remotePath, blockHashList);
 }
 
 QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
 {
+    qDebug() << "UploadBlock" << data.size();
     std::map<QString, QString> parameters = {
         {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
     };
-    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Put,
+    PNetworkAccessManager m;
+    m.setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(6000000, 5));
+    QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Put,
                                                           settings["UploadBlock"].toObject()["UrlPattern"].toString(), parameters, data);
     QJsonObject blockUploadResult = QJsonDocument::fromJson(reply->readAll()).object();
     reply->deleteLater();
+    qDebug() << "result" << blockUploadResult;
     return blockUploadResult["md5"].toString();
+}
+
+QString BaiduCloudWorker::uploadBlockFromFile(const QString &filePath, qint64 startIndex, qint64 length)
+{
+    QFile fileToUpload(filePath);
+    if (!fileToUpload.open(QIODevice::ReadOnly))
+        return "";
+    fileToUpload.seek(startIndex);
+    return uploadBlock(fileToUpload.read(length));
+}
+
+QString BaiduCloudWorker::uploadBlockFromMyFile(const std::tuple<QString, qint64, qint64> &parameters)
+{
+    return uploadBlockFromFile(std::get<0>(parameters), std::get<1>(parameters), std::get<2>(parameters));
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
