@@ -29,8 +29,10 @@ public:
     static PNetworkRetryPolicy *NoRetryPolicy(int timeout, PNetworkValidator validator = Validator::NoErrorValidator);
     static PNetworkRetryPolicy *FixedIntervalRetryPolicy(int timeout, int timesToTry, PNetworkValidator validator = Validator::NoErrorValidator);
     PNetworkRetryPolicy(PNetworkValidator validator) : validator(validator) { status = false; }
+    PNetworkRetryPolicy(const PNetworkRetryPolicy &other) : validator(other.validator), status(other.status) {}
     // Keep sync with QTimer::start(int msec)
     virtual int timeout() { return 0; }
+    virtual PNetworkRetryPolicy *clone() { return new PNetworkRetryPolicy(*this); }
     virtual void initializeRetry() {}
     virtual void moveNext() {}
     virtual bool validate(QNetworkReply *reply) { return validator(reply); }
@@ -44,8 +46,10 @@ class PNetworkRetryPolicyFixedIntervalRetry : public PNetworkRetryPolicy
     int baseTimeout;
     int timesToTry, timesTried;
 public:
+    PNetworkRetryPolicyFixedIntervalRetry(const PNetworkRetryPolicyFixedIntervalRetry &other);
     PNetworkRetryPolicyFixedIntervalRetry(int timeout, int timesToTry, PNetworkValidator validator);
     virtual void initializeRetry();
+    virtual PNetworkRetryPolicy *clone();
     virtual int timeout();
     virtual void moveNext();
     virtual bool needToTry();

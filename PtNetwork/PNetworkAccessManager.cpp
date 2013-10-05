@@ -20,12 +20,15 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
                                                                          const QByteArray &data,
                                                                          PNetworkRetryPolicy *retryPolicy)
 {
+
     for (auto parameter : parameters)
         urlPattern.replace(QString("{%1}").arg(parameter.first), parameter.second);
 
     QNetworkReply *reply;
     int i = 0;
+    qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
+        qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
         qDebug() << QString("Tried %1 times").arg(i++);
         switch (verb) {
         case HttpVerb::Get:
@@ -61,7 +64,8 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
 
 QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(Pt::Network::HttpVerb verb, QString urlPattern, const std::map<QString, QString> &parameters, const QByteArray &data)
 {
-    return executeNetworkRequest(verb, urlPattern, parameters, data, defaultRetryPolicy);
+    qDebug() << defaultRetryPolicy->timeout();
+    return executeNetworkRequest(verb, urlPattern, parameters, data, defaultRetryPolicy->clone());
 }
 
 Pt::Network::PNetworkAccessManager::~PNetworkAccessManager()

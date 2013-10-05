@@ -1,13 +1,25 @@
 #include "PMessageLogger.h"
 #include <QTextStream>
 #include <QFile>
+#include <QDebug>
+
+Pt::Core::PMessageLogger *Pt::Core::PMessageLogger::staticInstance = nullptr;
+
+Pt::Core::PMessageLogger *Pt::Core::PMessageLogger::globalInstance()
+{
+    if (staticInstance == nullptr)
+        staticInstance = new PMessageLogger();
+    return staticInstance;
+}
 
 Pt::Core::PMessageLogger::PMessageLogger()
 {
     logPattern = DefaultLogPattern;
-    for (LogType t = LogType::InformationLog; t <= LogType::FatalLog; static_cast<LogType>(static_cast<int>(t) + 1))
+    for (LogType t = LogType::InformationLog; t <= LogType::FatalLog; t = static_cast<LogType>(static_cast<int>(t) + 1))
         logFileNamePattern.insert(t, {DefaultLogFileNamePattern + ".log"});
     logFileNamePattern.insert(LogType::DebugLog, {DefaultLogFileNamePattern + "-debug.log"});
+    logFileNamePattern.insert(LogType::DebugLog, {DefaultLogFileNamePattern + "-full.log"});
+    logFileNamePattern.insert(LogType::DebugLog, {DefaultLogFileNamePattern + "-full.log"});
     displayBound = DefaultDisplayBound;
 }
 
@@ -20,7 +32,7 @@ Pt::Core::PMessageLogger::PMessageLogger(QPluginLoader &loader) :
 
 void Pt::Core::PMessageLogger::log(QString content, LogType logType) const
 {
-    QList<QPair<QString, QString>> parameters = {
+    std::map<QString, QString> parameters = {
         {"content", content},
         {"type", LogStrings[logType]},
         {"time", QDateTime::currentDateTime().toString(Qt::ISODate)}
