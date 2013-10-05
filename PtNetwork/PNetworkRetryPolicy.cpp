@@ -25,6 +25,12 @@ void Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::initializeRetry()
     timesTried = 0;
 }
 
+Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::clone()
+{
+    qDebug() << "Derived";
+    return new PNetworkRetryPolicyFixedIntervalRetry(*this);
+}
+
 int Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::timeout()
 {
     return baseTimeout;
@@ -38,4 +44,10 @@ void Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::moveNext()
 bool Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::needToTry()
 {
     return timesTried < timesToTry;
+}
+
+
+Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::PNetworkRetryPolicyFixedIntervalRetry(const Pt::Network::PNetworkRetryPolicyFixedIntervalRetry &other)
+    : PNetworkRetryPolicy(other), baseTimeout(other.baseTimeout), timesToTry(other.timesToTry), timesTried(timesTried)
+{
 }

@@ -13,7 +13,9 @@ namespace Core {
 
 class PTCORESHARED_EXPORT PMessageLogger
 {
+    static PMessageLogger *staticInstance;
 public:
+    static PMessageLogger *globalInstance();
     // Public Types
     enum class LogType {
         TraceLog, DebugLog, InformationLog, WarningLog, ErrorLog, FatalLog
@@ -23,8 +25,8 @@ public:
     const QMap<LogType, QString> LogStrings = {{LogType::TraceLog, "TRACE"}, {LogType::DebugLog, "DEBUG"},
                                                {LogType::InformationLog, "INFO"}, {LogType::WarningLog, "WARN"},
                                                {LogType::ErrorLog, "ERROR"}, {LogType::FatalLog, "FATAL"}};
-    const QString DefaultLogPattern = "[{time}][{type}]{content}";
-    const QString DefaultLogFileNamePattern = "{base_path}/{date}/{iid}-{pid}";
+    const QString DefaultLogPattern = "[{datetime}][{type}]{content}";
+    const QString DefaultLogFileNamePattern = "{base_path}/{date}/{iid}-{pid}-{time}";
     const LogType DefaultDisplayBound = LogType::InformationLog;
 
     // Public Data Memebers
