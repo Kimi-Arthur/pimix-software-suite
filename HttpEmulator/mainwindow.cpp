@@ -9,6 +9,7 @@
 #include "PFileChooserWidget.h"
 
 // Local functions
+using namespace Pt::Network;
 
 QString process(char input)
 {
@@ -78,18 +79,20 @@ void MainWindow::on_requestButton_clicked()
         cookieJar.insertCookie(o);
     }
 
-    manager.setProxy(Pt::getProxy(ui->proxyLine->text()));
+    manager.setProxy(getProxy(ui->proxyLine->text()));
     qDebug() << manager.proxy();
     auto request = QNetworkRequest(url);
-    request.setRawHeader("Authorization", "Basic a2ltaS5yaWJlcnlAZ21haWwuY29tOmU2R0VveVFKdmhvbkswS3YvUGpDNCtNZUdUczlOTFFQZWdYWWJCdWJmN1U=");
+    //request.setHeader(QNetworkRequest::UserAgentHeader, "test");
+    //request.setRawHeader("Authorization", "Basic a2ltaS5yaWJlcnlAZ21haWwuY29tOmU2R0VveVFKdmhvbkswS3YvUGpDNCtNZUdUczlOTFFQZWdYWWJCdWJmN1U=");
 
+    //request.setRawHeader("X-MS-DataAcquisition-Tenant", "f7ca8e11-c205-4c06-9c63-ed002f21c10c");
     if (method == "GET")
         manager.get(request);
     if (method == "POST") {
         manager.post(request, data);
     }
     if (method == "PUT") {
-        request.setRawHeader("X-CEVALTOKEN", "5Dm6jD4tz1XYwA2UyDF4uQ773Y2B9zzNAAABP8YyoPgI9Mk_47TAjMpkVc70F-fFkyromg");
+        //request.setRawHeader("X-CEVALTOKEN", "5Dm6jD4tz1XYwA2UyDF4uQ773Y2B9zzNAAABP8YyoPgI9Mk_47TAjMpkVc70F-fFkyromg");
         manager.put(request, f);
     }
     if (method == "DELETE")
