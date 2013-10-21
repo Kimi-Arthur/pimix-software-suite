@@ -5,15 +5,17 @@
 #include <QObject>
 #include <QString>
 #include <QJsonObject>
+#include <QRunnable>
 #include "capricorncore_global.h"
-#include "PMessageLogger.h"
+#include "PLogger.h"
 
-class CAPRICORNCORESHARED_EXPORT CapricornWorker
+class CAPRICORNCORESHARED_EXPORT CapricornWorker : public QRunnable
 {
 public:
     typedef enum {
         Success, Failure
     } ResultType;
+    virtual void run() {}
     //virtual CapricornWorker(PMessageLogger logger) = 0;
     virtual ResultType startJob(QJsonObject jobInfo = QJsonObject()) = 0;
     virtual ResultType stopJob() = 0;
@@ -37,7 +39,7 @@ class CAPRICORNCORESHARED_EXPORT CapricornWorkerFactory
 public:
     CapricornWorkerFactory() {}
     CapricornWorkerFactory(QString test) {qDebug() << test;}
-    virtual CapricornWorker *createInstance(Pt::Core::PMessageLogger logger) = 0;
+    virtual CapricornWorker *createInstance(Pt::Core::PLogger logger) = 0;
     virtual void destroyInstance(CapricornWorker *workerInstance) = 0;
     virtual ~CapricornWorkerFactory() {}
 };

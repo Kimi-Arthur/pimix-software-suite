@@ -10,14 +10,14 @@
 #include <QTimer>
 #include <QStringList>
 #include <QtConcurrent/QtConcurrent>
-#include "PMessageLogger.h"
+#include "PLogger.h"
 #include <tuple>
-#include "PMessageLogger.h"
+#include "PLogger.h"
 
 BaiduCloudWorker::BaiduCloudWorker()
 {
-    qDebug() << "1" << Pt::Core::PMessageLogger::globalInstance()->logPattern;
-    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(6000000, 5));
+    qDebug() << "1" << Pt::Core::PLogger::globalInstance()->logPattern;
+    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
         return;
@@ -42,7 +42,7 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QSt
     f.close();
     if (fileSize <= BaseBlockSize)
         uploadFileDirect(remotePath, localPath);
-    else uploadFileByBlockMultithread(remotePath, localPath);
+    else uploadFileByBlockSinglethread(remotePath, localPath);
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)

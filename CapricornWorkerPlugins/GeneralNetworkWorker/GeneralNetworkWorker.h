@@ -38,7 +38,7 @@ public:
         qDebug() << test << "gnw";
     }
 
-    CapricornWorker *createInstance(Pt::Core::PMessageLogger logger);
+    CapricornWorker *createInstance(Pt::Core::PLogger logger);
 
 };
 

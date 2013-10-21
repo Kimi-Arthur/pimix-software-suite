@@ -13,6 +13,7 @@ public:
     QMap<QString, ExecuteMethod> methods;
 
     BaseCapricornWorker();
+    virtual void run();
     virtual ResultType startJob(QJsonObject jobInfo=QJsonObject());
     virtual ResultType stopJob();
     virtual ResultType pauseJob();

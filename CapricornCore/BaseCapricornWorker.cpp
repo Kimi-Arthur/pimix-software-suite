@@ -5,6 +5,13 @@ BaseCapricornWorker::BaseCapricornWorker()
 {
 }
 
+void BaseCapricornWorker::run()
+{
+//    qDebug() << jobInfo;
+//    QString method = jobInfo["method"].toString();
+//    methods[method](jobInfo);
+}
+
 CapricornWorker::ResultType BaseCapricornWorker::startJob(QJsonObject jobInfo)
 {
     qDebug() << jobInfo;
