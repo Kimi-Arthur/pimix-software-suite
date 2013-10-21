@@ -5,17 +5,36 @@
 #include <QSet>
 #include <QString>
 #include <QDateTime>
+#include <QTextStream>
 #include "ptcore_global.h"
-#include <QPluginLoader>
+#include "PSerializer.h"
 
 namespace Pt {
 namespace Core {
 
-class PTCORESHARED_EXPORT PMessageLogger
+class PTCORESHARED_EXPORT PLogWriter
 {
-    static PMessageLogger *staticInstance;
+    QList<QTextStream *> outputStreamList;
+    void writeLog(const QStringList &contentList);
+    QStringList toObjectString(const QString &raw);
+    template<class T>
+    QStringList toObjectString(const QList<T> &raw);
 public:
-    static PMessageLogger *globalInstance();
+
+    //void log(QString content);
+    template<class T>
+    void log(T object, const QString &objectName="Variable");
+/*    template<class T, typename ToObjectStringFunction>
+    void log(T object, ToObjectStringFunction toObjectStringFunction, const QString &objectName=QStringLiteral("Variable"));*/
+};
+
+
+
+class PTCORESHARED_EXPORT PLogger
+{
+    static PLogger *staticInstance;
+public:
+    static PLogger *globalInstance();
     // Public Types
     enum class LogType {
         TraceLog, DebugLog, InformationLog, WarningLog, ErrorLog, FatalLog
@@ -36,8 +55,8 @@ public:
     QMap<QString, QString> generalParamters; // Customized fill-in parameters.
 
     // Public Constructors
-    PMessageLogger();
-    PMessageLogger(QPluginLoader &loader);
+    PLogger();
+    //PLogger(QPluginLoader &loader);
 
     // Public Methods
     void log(QString content, LogType logType = LogType::TraceLog) const;
@@ -48,6 +67,9 @@ public:
     void fatal(QString content) const;
 
 private:
+    const QString ListSeparator = ", ";
+    template<class T>
+    QString objectToString(const QList<T> &objectList);
     void displayLog(QString resultLog, LogType logType) const;
     void writeLog(QString resultLog, LogType logType) const;
 };

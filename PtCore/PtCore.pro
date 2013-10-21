@@ -18,7 +18,8 @@ SOURCES += PtCore.cpp \
     PFile.cpp \
     PConsole.cpp \
     PJsonValue.cpp \
-    PMessageLogger.cpp
+    PLogger.cpp \
+    PSerializer.cpp
 
 HEADERS += PtCore.h\
         ptcore_global.h \
@@ -26,7 +27,8 @@ HEADERS += PtCore.h\
     PFile.h \
     PConsole.h \
     PJsonValue.h \
-    PMessageLogger.h
+    PLogger.h \
+    PSerializer.h
 
 unix:!symbian {
     maemo5 {
