@@ -30,8 +30,8 @@ Pt::Core::PLogger::PLogger()
 
 //}
 
-
-void Pt::Core::PLogger::log(QString content, LogType logType) const
+template<class T>
+void Pt::Core::PLogger::log(const T &content, LogType logType) const
 {
     std::map<QString, QString> parameters = {
         {"content", content},
@@ -46,27 +46,32 @@ void Pt::Core::PLogger::log(QString content, LogType logType) const
     writeLog(resultLog, logType);
 }
 
-void Pt::Core::PLogger::debug(QString content) const
+template<class T>
+void Pt::Core::PLogger::debug(const T& content) const
 {
     log(content, LogType::DebugLog);
 }
 
-void Pt::Core::PLogger::info(QString content) const
+template<class T>
+void Pt::Core::PLogger::info(const T& content) const
 {
     log(content, LogType::InformationLog);
 }
 
-void Pt::Core::PLogger::warn(QString content) const
+template<class T>
+void Pt::Core::PLogger::warn(const T& content) const
 {
     log(content, LogType::WarningLog);
 }
 
-void Pt::Core::PLogger::error(QString content) const
+template<class T>
+void Pt::Core::PLogger::error(const T& content) const
 {
     log(content, LogType::ErrorLog);
 }
 
-void Pt::Core::PLogger::fatal(QString content) const
+template<class T>
+void Pt::Core::PLogger::fatal(const T& content) const
 {
     log(content, LogType::FatalLog);
 }
@@ -123,21 +128,8 @@ QStringList Pt::Core::PLogWriter::toObjectString(const QList<T> &raw)
     return "[" + resultList.join(", ") + "]";
 }
 
-/*void Pt::Core::PLogWriter::log(QString content)
-{
-    writeLog(content);
-}*/
-
 template<class T>
 void Pt::Core::PLogWriter::log(T object, const QString &objectName)
 {
     writeLog(objectName + "=" + toObjectString(object));
 }
-
-/*
-template<class T>
-void Pt::Core::PLogWriter::log(T object, Pt::Core::PLogWriter::ToObjectStringFunction toObjectStringFunction, const QString &objectName)
-{
-    writeLog(objectName + "=" + toObjectStringFunction(object));
-}
-*/
