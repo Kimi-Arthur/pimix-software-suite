@@ -59,12 +59,18 @@ public:
     //PLogger(QPluginLoader &loader);
 
     // Public Methods
-    void log(QString content, LogType logType = LogType::TraceLog) const;
-    void debug(QString content) const;
-    void info(QString content) const;
-    void warn(QString content) const;
-    void error(QString content) const;
-    void fatal(QString content) const;
+    template<class T>
+    void log(const T &content, LogType logType = LogType::TraceLog) const;
+    template<class T>
+    void debug(const T &content) const;
+    template<class T>
+    void info(const T &content) const;
+    template<class T>
+    void warn(const T &content) const;
+    template<class T>
+    void error(const T &content) const;
+    template<class T>
+    void fatal(const T &content) const;
 
 private:
     const QString ListSeparator = ", ";

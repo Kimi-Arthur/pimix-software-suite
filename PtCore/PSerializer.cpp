@@ -1,7 +1,7 @@
 #include "PSerializer.h"
 
-template<>
-std::function<qint64(QString)> Pt::Core::PSerializer<qint64>::fromStringFunction = [](QString s) { return s.toLongLong(); };
+Decl_SerializeFunction(qint64, return QString::number(t); )
+Decl_DeserializeFunction(qint64, return s.toLongLong(); )
 
-template<>
-std::function<QString(qint64)> Pt::Core::PSerializer<qint64>::toStringFunction = [](qint64 t) { return QString::number(t); };
+Decl_SerializeFunction(QString, return t; )
+Decl_DeserializeFunction(QString, return s; )

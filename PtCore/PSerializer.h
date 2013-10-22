@@ -4,47 +4,53 @@
 #include <QString>
 #include <QMap>
 #include <functional>
+#include "PtCore.h"
 
 namespace Pt {
 namespace Core {
 
 template<class T>
-class EnumSerializer
+class PTCORESHARED_EXPORT EnumSerializer
 {
-    static QMap<QString, T> fromStringMap;
-    static QMap<T, QString> toStringMap;
 public:
-    static T fromString(QString s) {
-        return fromStringMap.value(s);
-    }
-    static QString toString(T t) {
-        return toStringMap.value(t);
-    }
+    static QMap<QString, T> stringToValueMap;
+    static QMap<T, QString> valueToStringMap;
 };
 
 template<class T>
-class PSerializer
+class PTCORESHARED_EXPORT PSerializerInformation
 {
-    static std::function<T(QString)> fromStringFunction;
-    static std::function<QString(T)> toStringFunction;
 public:
-    PSerializer();
-    static inline QString toString(T arg)
+    static std::function<QString(const T&)> serializeFunction;
+    static std::function<T(const QString&)> deserializeFunction;
+};
+
+class PTCORESHARED_EXPORT PSerializer
+{
+public:
+    template<class T>
+    static QString serialize(T value)
     {
-        return toStringFunction(arg);
+        return PSerializerInformation<T>::serializeFunction(value);
     }
 
-    static inline T fromString(QString arg)
+    template<class T>
+    static T deserialize(QString str)
     {
-        return fromStringFunction(arg);
+        return PSerializerInformation<T>::deserializeFunction(str);
     }
 };
 
+#define Decl_SerializeFunction(T, C...) \
+    template<> std::function<QString(const T&)> Pt::Core::PSerializerInformation<T>::serializeFunction = [](const T &t) { C };
+
+#define Decl_DeserializeFunction(T, C...) \
+    template<> std::function<T(const QString&)> Pt::Core::PSerializerInformation<T>::deserializeFunction = [](const QString &s) { C };
+
 
 #define Decl_Enum_Serializer(T) \
-    template<> std::function<T(QString)> PSerializer<T>::fromStringFunction = [](QString s) { return EnumSerializer<T>::fromString(s) }; \
-    template<> std::function<QString(T)> PSerializer<T>::toStringFunction = [](T t) { return EnumSerializer<T>::toString(s) };
-
+    Decl_DeserializeFunction(T, return Pt::Core::EnumSerializer<T>::stringToValueMap.value(s); ) \
+    Decl_SerializeFunction(T, return Pt::Core::EnumSerializer<T>::valueToStringMap.value(s); )
 }
 }
 
