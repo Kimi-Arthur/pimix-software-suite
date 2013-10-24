@@ -48,6 +48,6 @@ bool Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::needToTry()
 
 
 Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::PNetworkRetryPolicyFixedIntervalRetry(const Pt::Network::PNetworkRetryPolicyFixedIntervalRetry &other)
-    : PNetworkRetryPolicy(other), baseTimeout(other.baseTimeout), timesToTry(other.timesToTry), timesTried(timesTried)
+    : PNetworkRetryPolicy(other), baseTimeout(other.baseTimeout), timesToTry(other.timesToTry), timesTried(other.timesTried)
 {
 }

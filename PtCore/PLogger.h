@@ -12,24 +12,6 @@
 namespace Pt {
 namespace Core {
 
-class PTCORESHARED_EXPORT PLogWriter
-{
-    QList<QTextStream *> outputStreamList;
-    void writeLog(const QStringList &contentList);
-    QStringList toObjectString(const QString &raw);
-    template<class T>
-    QStringList toObjectString(const QList<T> &raw);
-public:
-
-    //void log(QString content);
-    template<class T>
-    void log(T object, const QString &objectName="Variable");
-/*    template<class T, typename ToObjectStringFunction>
-    void log(T object, ToObjectStringFunction toObjectStringFunction, const QString &objectName=QStringLiteral("Variable"));*/
-};
-
-
-
 class PTCORESHARED_EXPORT PLogger
 {
     static PLogger *staticInstance;
@@ -41,10 +23,7 @@ public:
     };
 
     // Public Constants
-    const QMap<LogType, QString> LogStrings = {{LogType::TraceLog, "TRACE"}, {LogType::DebugLog, "DEBUG"},
-                                               {LogType::InformationLog, "INFO"}, {LogType::WarningLog, "WARN"},
-                                               {LogType::ErrorLog, "ERROR"}, {LogType::FatalLog, "FATAL"}};
-    const QString DefaultLogPattern = "[{datetime}][{type}]{content}";
+    const QString DefaultLogPattern = "[{datetime}][{type}] {content}";
     const QString DefaultLogFileNamePattern = "{base_path}/{date}/{iid}-{pid}-{time}";
     const LogType DefaultDisplayBound = LogType::InformationLog;
 
@@ -56,23 +35,58 @@ public:
 
     // Public Constructors
     PLogger();
-    //PLogger(QPluginLoader &loader);
 
     // Public Methods
     template<class T>
-    void log(const T &content, LogType logType = LogType::TraceLog) const;
+    void log(const T &content, const QString &objectName = "", LogType logType = LogType::TraceLog) const
+    {
+        std::map<QString, QString> parameters = {
+            {"content", PSerializer::serialize(content)},
+            {"type", LogTypeStrings[logType]},
+            {"datetime", QDateTime::currentDateTime().toString(Qt::ISODate)}
+        };
+        QString resultLog = logPattern;
+        foreach (auto parameter, parameters)
+            resultLog.replace("{" + parameter.first + "}", parameter.second);
+
+        displayLog(resultLog, logType);
+        writeLog(resultLog, logType);
+    }
+
     template<class T>
-    void debug(const T &content) const;
+    inline void debug(const T &content, const QString &objectName = "") const
+    {
+        log(content, objectName, LogType::DebugLog);
+    }
+
     template<class T>
-    void info(const T &content) const;
+    inline void info(const T &content, const QString &objectName = "") const
+    {
+        log(content, objectName, LogType::InformationLog);
+    }
+
     template<class T>
-    void warn(const T &content) const;
+    inline void warn(const T &content, const QString &objectName = "") const
+    {
+        log(content, objectName, LogType::WarningLog);
+    }
+
     template<class T>
-    void error(const T &content) const;
+    inline void error(const T &content, const QString &objectName = "") const
+    {
+        log(content, objectName, LogType::ErrorLog);
+    }
+
     template<class T>
-    void fatal(const T &content) const;
+    inline void fatal(const T &content, const QString &objectName = "") const
+    {
+        log(content, objectName, LogType::FatalLog);
+    }
 
 private:
+    const QMap<LogType, QString> LogTypeStrings = {{LogType::TraceLog, "TRACE"}, {LogType::DebugLog, "DEBUG"},
+                                                   {LogType::InformationLog, "INFO"}, {LogType::WarningLog, "WARN"},
+                                                   {LogType::ErrorLog, "ERROR"}, {LogType::FatalLog, "FATAL"}};
     const QString ListSeparator = ", ";
     template<class T>
     QString objectToString(const QList<T> &objectList);

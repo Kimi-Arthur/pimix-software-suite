@@ -9,6 +9,54 @@
 namespace Pt {
 namespace Core {
 
+enum class PSerializationType
+{
+    Normal, Object, Xml, Json
+};
+
+template<class T>
+class PTCORESHARED_EXPORT PSerializerInformation
+{
+public:
+    static QMap<PSerializationType, std::function<QString(const T&)>> serializeFunctions;
+    static QMap<PSerializationType, std::function<T(const QString&)>> deserializeFunctions;
+};
+
+class PTCORESHARED_EXPORT PSerializer
+{
+public:
+    template<class T>
+    static inline QString serialize(const T &value, PSerializationType serializationType = PSerializationType::Normal)
+    {
+        return PSerializerInformation<T>::serializeFunctions.value(serializationType)(value);
+    }
+
+    template<class T>
+    static inline T deserialize(const QString &data, PSerializationType serializationType = PSerializationType::Normal)
+    {
+        return PSerializerInformation<T>::deserializeFunctions.value(serializationType)(data);
+    }
+};
+
+typedef char * cstring;
+#define DeclStart_SerializeFunctions(T) \
+    template<> \
+    QMap<Pt::Core::PSerializationType, std::function<QString(const T&)>> \
+    Pt::Core::PSerializerInformation<T>::serializeFunctions
+
+#define DeclStart_DeserializeFunctions(T) \
+    template<> \
+    QMap<Pt::Core::PSerializationType, std::function<T(const QString&)>> \
+    Pt::Core::PSerializerInformation<T>::deserializeFunctions
+
+#define Decl_SerializeFunctionEntry(ST, T, C...) \
+    {Pt::Core::PSerializationType::ST, [](const T &value) -> QString { C } }
+
+#define Decl_DeserializeFunctionEntry(ST, T, C...) \
+    {Pt::Core::PSerializationType::ST, [](const QString &data) -> T { C } }
+
+// EnumSerialization
+
 template<class T>
 class PTCORESHARED_EXPORT EnumSerializer
 {
@@ -16,37 +64,6 @@ public:
     static QMap<QString, T> stringToValueMap;
     static QMap<T, QString> valueToStringMap;
 };
-
-template<class T>
-class PTCORESHARED_EXPORT PSerializerInformation
-{
-public:
-    static std::function<QString(const T&)> serializeFunction;
-    static std::function<T(const QString&)> deserializeFunction;
-};
-
-class PTCORESHARED_EXPORT PSerializer
-{
-public:
-    template<class T>
-    static QString serialize(T value)
-    {
-        return PSerializerInformation<T>::serializeFunction(value);
-    }
-
-    template<class T>
-    static T deserialize(QString str)
-    {
-        return PSerializerInformation<T>::deserializeFunction(str);
-    }
-};
-
-#define Decl_SerializeFunction(T, C...) \
-    template<> std::function<QString(const T&)> Pt::Core::PSerializerInformation<T>::serializeFunction = [](const T &t) { C };
-
-#define Decl_DeserializeFunction(T, C...) \
-    template<> std::function<T(const QString&)> Pt::Core::PSerializerInformation<T>::deserializeFunction = [](const QString &s) { C };
-
 
 #define Decl_Enum_Serializer(T) \
     Decl_DeserializeFunction(T, return Pt::Core::EnumSerializer<T>::stringToValueMap.value(s); ) \
