@@ -24,58 +24,6 @@ Pt::Core::PLogger::PLogger()
     displayBound = DefaultDisplayBound;
 }
 
-//Pt::Core::PLogger::PLogger(QPluginLoader &loader) :
-//    PLogger()
-//{
-
-//}
-
-template<class T>
-void Pt::Core::PLogger::log(const T &content, LogType logType) const
-{
-    std::map<QString, QString> parameters = {
-        {"content", content},
-        {"type", LogStrings[logType]},
-        {"time", QDateTime::currentDateTime().toString(Qt::ISODate)}
-    };
-    QString resultLog = logPattern;
-    foreach (auto parameter, parameters)
-        resultLog.replace("{" + parameter.first + "}", parameter.second);
-
-    displayLog(resultLog, logType);
-    writeLog(resultLog, logType);
-}
-
-template<class T>
-void Pt::Core::PLogger::debug(const T& content) const
-{
-    log(content, LogType::DebugLog);
-}
-
-template<class T>
-void Pt::Core::PLogger::info(const T& content) const
-{
-    log(content, LogType::InformationLog);
-}
-
-template<class T>
-void Pt::Core::PLogger::warn(const T& content) const
-{
-    log(content, LogType::WarningLog);
-}
-
-template<class T>
-void Pt::Core::PLogger::error(const T& content) const
-{
-    log(content, LogType::ErrorLog);
-}
-
-template<class T>
-void Pt::Core::PLogger::fatal(const T& content) const
-{
-    log(content, LogType::FatalLog);
-}
-
 void Pt::Core::PLogger::displayLog(QString resultLog, LogType logType) const
 {
     if (logType >= displayBound)
@@ -92,44 +40,4 @@ void Pt::Core::PLogger::writeLog(QString resultLog, LogType logType) const
             file.close();
         }
     }
-}
-
-
-template<class T>
-QString Pt::Core::PLogger::objectToString(const QList<T> &objectList)
-{
-    QStringList stringList;
-    foreach (auto object, objectList)
-        stringList.append(objectToString(object));
-    return QString("[%1]").arg(stringList.join(ListSeparator));
-}
-
-
-void Pt::Core::PLogWriter::writeLog(const QStringList &contentList)
-{
-    foreach (auto ts, outputStreamList) {
-        foreach (auto &content, contentList) {
-            *ts << content << endl;
-        }
-    }
-}
-
-QStringList Pt::Core::PLogWriter::toObjectString(const QString &raw)
-{
-    return QStringList(QStringLiteral("\"%1\"").arg(raw));
-}
-
-template<class T>
-QStringList Pt::Core::PLogWriter::toObjectString(const QList<T> &raw)
-{
-    QStringList resultList;
-    foreach (T &item, raw)
-        resultList.append(toObjectString(raw));
-    return "[" + resultList.join(", ") + "]";
-}
-
-template<class T>
-void Pt::Core::PLogWriter::log(T object, const QString &objectName)
-{
-    writeLog(objectName + "=" + toObjectString(object));
 }
