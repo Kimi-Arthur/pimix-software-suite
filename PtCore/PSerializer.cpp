@@ -23,15 +23,16 @@ DeclStart_DeserializeFunctions(QString) =
     Decl_DeserializeFunctionEntry(Normal, QString, return data;)
 };
 
-DeclStart_SerializeFunctions(cstring) =
+DeclStart_SerializeFunctions(QLatin1String) =
 {
-    Decl_SerializeFunctionEntry(Normal, cstring, return QString::fromUtf8(value); )
+    Decl_SerializeFunctionEntry(Normal, QLatin1String, return value;)
 };
 
-DeclStart_DeserializeFunctions(cstring) =
+DeclStart_DeserializeFunctions(QLatin1String) =
 {
-    Decl_DeserializeFunctionEntry(Normal, cstring, return data.toUtf8().data(); )
+    Decl_DeserializeFunctionEntry(Normal, QLatin1String, return QLatin1String(data.toLatin1());)
 };
+
 
 //Decl_SerializeFunction(qint64, return QString::number(t); )
 //Decl_SerializeFunctionItem(qint64, Object, return QString::number(t); )

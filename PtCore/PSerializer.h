@@ -5,10 +5,12 @@
 #include <QMap>
 #include <functional>
 #include "PtCore.h"
+#include <QDebug>
 
 namespace Pt {
 namespace Core {
 
+#define sl QStringLiteral
 enum class PSerializationType
 {
     Normal, Object, Xml, Json
@@ -70,5 +72,6 @@ public:
     Decl_SerializeFunction(T, return Pt::Core::EnumSerializer<T>::valueToStringMap.value(s); )
 }
 }
+
 
 #endif // PSERIALIZER_H

@@ -9,8 +9,6 @@ QT       -= gui
 TARGET = PtCore
 TEMPLATE = lib
 
-CONFIG += C++11
-
 DEFINES += PTCORE_LIBRARY
 
 SOURCES += PtCore.cpp \
