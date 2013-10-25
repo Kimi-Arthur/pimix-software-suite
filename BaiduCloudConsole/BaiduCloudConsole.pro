@@ -9,7 +9,7 @@ QT       += core network
 QT       -= gui
 
 TARGET = BaiduCloudConsole
-CONFIG   += console C++11
+CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app

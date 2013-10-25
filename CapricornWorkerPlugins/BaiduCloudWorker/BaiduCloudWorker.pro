@@ -11,8 +11,6 @@ QT       -= gui
 TARGET = BaiduCloudWorker
 TEMPLATE = lib
 
-CONFIG += C++11
-
 DEFINES += BAIDUCLOUDWORKER_LIBRARY
 
 SOURCES += BaiduCloudWorker.cpp

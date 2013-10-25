@@ -8,8 +8,6 @@ QT       -= gui
 
 QT       += concurrent
 
-CONFIG += C++11
-
 TARGET = CapricornCore
 TEMPLATE = lib
 

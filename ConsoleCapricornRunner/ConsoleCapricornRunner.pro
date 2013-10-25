@@ -8,8 +8,6 @@ QT       += core
 
 QT       -= gui
 
-CONFIG += C++11
-
 TARGET = ConsoleCapricornRunner
 CONFIG   += console
 CONFIG   -= app_bundle

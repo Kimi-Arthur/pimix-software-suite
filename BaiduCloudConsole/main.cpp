@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     qDebug() << PSerializer::serialize(qint64(16));
-    qDebug() << PSerializer::serialize<char *>("123");
-    PLogger::globalInstance()->error("是厉害啊！");
+    qDebug() << PSerializer::serialize(sl("123"));
+    PLogger::globalInstance()->error(sl("是厉害啊！"));
 //    qDebug() << PSerializer::deserialize<char *>("abc");
 //    Pt::Core::PLogger::globalInstance()->logPattern = "abc";
 //    auto parameters = QCoreApplication::arguments();

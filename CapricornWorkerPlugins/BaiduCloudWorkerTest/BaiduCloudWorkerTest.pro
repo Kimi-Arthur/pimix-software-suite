@@ -9,7 +9,7 @@ QT       += testlib network
 QT       -= gui
 
 TARGET = tst_BaiduCloudWorkerTest
-CONFIG   += console C++11
+CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app
