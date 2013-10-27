@@ -13,6 +13,16 @@ DeclStart_DeserializeFunctions(qint64) =
     Decl_DeserializeFunctionEntry(Normal, qint64, return data.toLongLong();)
 };
 
+DeclStart_SerializeFunctions(int) =
+{
+    Decl_SerializeFunctionEntry(Normal, int, return QString::number(value);)
+};
+
+DeclStart_DeserializeFunctions(int) =
+{
+    Decl_DeserializeFunctionEntry(Normal, int, return data.toInt();)
+};
+
 DeclStart_SerializeFunctions(QString) =
 {
     Decl_SerializeFunctionEntry(Normal, QString, return value;)
@@ -23,20 +33,7 @@ DeclStart_DeserializeFunctions(QString) =
     Decl_DeserializeFunctionEntry(Normal, QString, return data;)
 };
 
-DeclStart_SerializeFunctions(QLatin1String) =
+DeclStart_DeserializeFunctions(char *) =
 {
-    Decl_SerializeFunctionEntry(Normal, QLatin1String, return value;)
+    Decl_DeserializeFunctionEntry(Normal, char *, return data.toUtf8().data();)
 };
-
-DeclStart_DeserializeFunctions(QLatin1String) =
-{
-    Decl_DeserializeFunctionEntry(Normal, QLatin1String, return QLatin1String(data.toLatin1());)
-};
-
-
-//Decl_SerializeFunction(qint64, return QString::number(t); )
-//Decl_SerializeFunctionItem(qint64, Object, return QString::number(t); )
-//Decl_DeserializeFunction(qint64, return s.toLongLong(); )
-
-//Decl_SerializeFunction(QString, return t; )
-//Decl_DeserializeFunction(QString, return s; )

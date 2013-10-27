@@ -54,6 +54,12 @@ public:
     }
 
     template<class T>
+    inline void trace(const T &content, const QString &objectName = "") const
+    {
+        log(content, objectName, LogType::TraceLog);
+    }
+
+    template<class T>
     inline void debug(const T &content, const QString &objectName = "") const
     {
         log(content, objectName, LogType::DebugLog);
