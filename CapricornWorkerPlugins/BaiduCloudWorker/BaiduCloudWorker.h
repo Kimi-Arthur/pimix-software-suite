@@ -1,6 +1,7 @@
 #ifndef BAIDUCLOUDWORKER_H
 #define BAIDUCLOUDWORKER_H
 
+#include "PLogger.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMap>
@@ -12,6 +13,8 @@
 #include "PtNetwork.h"
 #include "map"
 #include "PNetworkAccessManager.h"
+
+using namespace Pt::Core;
 
 using namespace Pt::Network;
 
@@ -28,8 +31,9 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject, public Ba
     PNetworkAccessManager *manager = new PNetworkAccessManager();
     // Temp variables
     qint64 bc;
+    PLogger *logger;
 public:
-    BaiduCloudWorker();
+    BaiduCloudWorker(PLogger *_logger = new PLogger());
     ResultType downloadFile(QString remotePath, QString localPath);
     ResultType uploadFile(QString remotePath, QString localPath);
     ResultType removePath(QString remotePath);

@@ -14,9 +14,10 @@
 #include <tuple>
 #include "PLogger.h"
 
-BaiduCloudWorker::BaiduCloudWorker()
+BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
+    : logger(_logger)
 {
-    qDebug() << "1" << Pt::Core::PLogger::globalInstance()->logPattern;
+    logger->trace("[MethodIn ] BaiduCloudWorker::BaiduCloudWorker");
     manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
@@ -24,7 +25,7 @@ BaiduCloudWorker::BaiduCloudWorker()
     auto value = settingsFile.readAll();
     settings = QJsonDocument::fromJson(value).object();
     qDebug() << settings;
-    //methods["download"] = ExecuteMethod(&GeneralNetworkWorker::download);
+    logger->trace("[MethodOut] BaiduCloudWorker::BaiduCloudWorker");
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
@@ -34,7 +35,7 @@ CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, Q
 
 CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
 {
-    qDebug() << "First";
+    logger->trace("[MethodIn ] BaiduCloudWorker::uploadFile");
     QFile f(localPath);
     if (!f.open(QIODevice::ReadOnly))
         return Failure;
@@ -43,6 +44,7 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QSt
     if (fileSize <= BaseBlockSize)
         uploadFileDirect(remotePath, localPath);
     else uploadFileByBlockSinglethread(remotePath, localPath);
+    logger->trace("[MethodOut] BaiduCloudWorker::uploadFile");
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
