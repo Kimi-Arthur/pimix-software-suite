@@ -1,6 +1,12 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "PJsonValue.h"
+#include "PSerializer.h"
+
+DeclStart_SerializeFunctions(PJsonValue) =
+{
+    Decl_SerializeFunctionEntry(Normal, PJsonValue, return QString::fromUtf8(value.toDocument().toJson(QJsonDocument::JsonFormat::Compact)); )
+};
 
 PJsonValue PJsonValue::operator [](QString key) const
 {
@@ -20,6 +26,18 @@ PJsonValue PJsonValue::operator [](int index) const
 PJsonValueRef PJsonValue::operator [](int index)
 {
     return PJsonValueRef(this->toArray()[index]);
+}
+
+QJsonDocument PJsonValue::toDocument() const
+{
+    switch (type()) {
+    case Type::Array:
+        return QJsonDocument(this->toArray());
+    case Type::Object:
+        return QJsonDocument(this->toObject());
+    default:
+        return QJsonDocument();
+    }
 }
 
 

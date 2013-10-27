@@ -2,6 +2,7 @@
 #define PJSONVALUE_H
 
 #include "ptcore_global.h"
+#include <QJsonDocument>
 #include <QJsonValue>
 
 class PJsonValueRef;
@@ -15,6 +16,7 @@ public:
 
     PJsonValue operator [](int index) const;
     PJsonValueRef operator [](int index);
+    QJsonDocument toDocument() const;
 };
 
 class PTCORESHARED_EXPORT PJsonValueRef : public QJsonValueRef
@@ -27,5 +29,6 @@ public:
     PJsonValue operator [](int index) const;
     PJsonValueRef operator [](int index);
 };
+
 
 #endif // PJSONVALUE_H

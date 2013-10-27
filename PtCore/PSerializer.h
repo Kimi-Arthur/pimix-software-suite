@@ -10,10 +10,9 @@
 namespace Pt {
 namespace Core {
 
-#define sl QStringLiteral
 enum class PSerializationType
 {
-    Normal, Object, Xml, Json
+    Normal, LongFormat
 };
 
 template<class T>
@@ -33,6 +32,11 @@ public:
         return PSerializerInformation<T>::serializeFunctions.value(serializationType)(value);
     }
 
+    static inline QString serialize(const char *value, PSerializationType serializationType = PSerializationType::Normal)
+    {
+        return value;
+    }
+
     template<class T>
     static inline T deserialize(const QString &data, PSerializationType serializationType = PSerializationType::Normal)
     {
@@ -40,7 +44,6 @@ public:
     }
 };
 
-typedef char * cstring;
 #define DeclStart_SerializeFunctions(T) \
     template<> \
     QMap<Pt::Core::PSerializationType, std::function<QString(const T&)>> \
