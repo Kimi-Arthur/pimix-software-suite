@@ -21,14 +21,14 @@ SOURCES += PtCore.cpp \
     PChecksum.cpp
 
 HEADERS += PtCore.h\
-        ptcore_global.h \
     PSettings.h \
     PFile.h \
     PConsole.h \
     PJsonValue.h \
     PLogger.h \
     PSerializer.h \
-    PChecksum.h
+    PChecksum.h \
+    PtCore_global.h
 
 unix:!symbian {
     maemo5 {
