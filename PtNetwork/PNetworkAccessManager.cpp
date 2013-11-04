@@ -25,11 +25,9 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
         urlPattern.replace(QString("{%1}").arg(parameter.first), parameter.second);
 
     QNetworkReply *reply;
-    int i = 0;
-    qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
         qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
-        qDebug() << QString("Tried %1 times").arg(i++);
+        //qDebug() << QString("Tried %1 times").arg(i++);
         switch (verb) {
         case HttpVerb::Get:
             reply = get(QNetworkRequest(urlPattern));

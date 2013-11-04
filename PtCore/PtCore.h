@@ -1,7 +1,7 @@
 #ifndef PTCORE_H
 #define PTCORE_H
 
-#include "ptcore_global.h"
+#include "PtCore_global.h"
 
 #include <QDateTime>
 

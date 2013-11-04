@@ -1,9 +1,6 @@
 #ifndef PSERIALIZER_H
 #define PSERIALIZER_H
 
-#include <QString>
-#include <QMap>
-#include <functional>
 #include "PtCore.h"
 #include <QDebug>
 

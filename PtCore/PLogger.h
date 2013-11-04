@@ -1,12 +1,7 @@
 #ifndef PLOGGER_H
 #define PLOGGER_H
 
-#include <QMap>
-#include <QSet>
-#include <QString>
-#include <QDateTime>
-#include <QTextStream>
-#include "ptcore_global.h"
+#include "PtCore_global.h"
 #include "PSerializer.h"
 
 namespace Pt {
