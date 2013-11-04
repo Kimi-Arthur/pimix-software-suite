@@ -1,9 +1,7 @@
 #ifndef PFILE_H
 #define PFILE_H
 
-#include "ptcore_global.h"
-
-#include <QStringList>
+#include "PtCore_global.h"
 
 class PTCORESHARED_EXPORT PFile
 {

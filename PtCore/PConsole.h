@@ -1,7 +1,7 @@
 #ifndef PCONSOLE_H
 #define PCONSOLE_H
 
-#include "ptcore_global.h"
+#include "PtCore_global.h"
 #include <QStringList>
 
 class PTCORESHARED_EXPORT PConsole

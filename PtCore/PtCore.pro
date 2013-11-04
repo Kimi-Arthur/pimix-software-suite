@@ -9,6 +9,10 @@ QT       -= gui
 TARGET = PtCore
 TEMPLATE = lib
 
+CONFIG += precompile_header
+
+PRECOMPILED_HEADER = PtCore_global.h
+
 DEFINES += PTCORE_LIBRARY
 
 SOURCES += PtCore.cpp \

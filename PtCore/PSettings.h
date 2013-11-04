@@ -4,7 +4,7 @@
 #include <QString>
 #include <QMap>
 #include <QSharedPointer>
-#include "ptcore_global.h"
+#include "PtCore_global.h"
 
 class PSettings
 {

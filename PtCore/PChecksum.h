@@ -1,9 +1,7 @@
 #ifndef PCHECKSUM_H
 #define PCHECKSUM_H
 
-#include <QByteArray>
-#include <functional>
-#include "ptcore_global.h"
+#include "PtCore_global.h"
 
 class PChecksumMethod;
 

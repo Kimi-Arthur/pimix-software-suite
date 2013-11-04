@@ -1,7 +1,7 @@
 #ifndef PJSONVALUE_H
 #define PJSONVALUE_H
 
-#include "ptcore_global.h"
+#include "PtCore_global.h"
 #include <QJsonDocument>
 #include <QJsonValue>
 
