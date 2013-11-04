@@ -75,6 +75,19 @@ qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
         return 0;
 }
 
+CapricornWorker::ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
+{
+    std::map<QString, QString> parameters = {
+        {"RemotePath", remotePath},
+        {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
+        {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
+    };
+    std::map<QString, QString> fileInfos = getFileInfos(localPath);
+    parameters.insert(fileInfos.begin(), fileInfos.end());
+    manager->executeNetworkRequest(HttpVerb::Post, settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters);
+
+}
+
 CapricornWorker::ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localPath)
 {
     std::map<QString, QString> parameters = {
@@ -170,6 +183,18 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QStr
         data = fileToUpload.read(BaseBlockSize);
     }
     return mergeBlocks(remotePath, blockHashList);
+}
+
+bool BaiduCloudWorker::verifyFile(const QString &remotePath)
+{
+    std::map<QString, QString> parameters = {
+        {"RemotePath", remotePath},
+        {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
+        {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
+    };
+
+    manager->executeNetworkRequest(HttpVerb::Post, settings["VerifyFile"].toObject()["UrlPattern"].toString(), parameters);
+    return false;
 }
 
 QString BaiduCloudWorker::uploadBlock(const QByteArray &data)

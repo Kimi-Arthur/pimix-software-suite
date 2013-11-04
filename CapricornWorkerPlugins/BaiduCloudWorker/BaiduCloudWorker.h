@@ -41,9 +41,11 @@ private slots:
     void showProgress(qint64 bs, qint64 bt);
 private:
     qint64 static getBlockSize(qint64 fileSize);
+    ResultType uploadFileRapid(const QString &remotePath, const QString &localPath);
     ResultType uploadFileDirect(QString remotePath, QString localPath);
     ResultType uploadFileByBlockMultithread(QString remotePath, QString localPath);
     ResultType uploadFileByBlockSinglethread(QString remotePath, QString localPath);
+    bool verifyFile(const QString &remotePath);
     QString uploadBlock(const QByteArray &data);
     QString uploadBlockFromFile(const QString &filePath, qint64 startIndex, qint64 length);
     QString uploadBlockFromMyFile(const std::tuple<QString, qint64, qint64> &parameters);
