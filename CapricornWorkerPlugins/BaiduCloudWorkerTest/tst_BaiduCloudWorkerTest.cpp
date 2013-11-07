@@ -36,8 +36,8 @@ void BaiduCloudWorkerTest::uploadFileByBlockTest()
 
 void BaiduCloudWorkerTest::uploadFileByBlockMultithreadTest()
 {
-    BaiduCloudWorker w;
-    QCOMPARE(w.uploadFile("test/1stHalf.mkv", "U:/1stHalf.mkv"), CapricornWorker::Success);
+//    BaiduCloudWorker w;
+//    QCOMPARE(w.uploadFile("test/1stHalf.mkv", "U:/1stHalf.mkv"), CapricornWorker::Success);
 }
 
 void BaiduCloudWorkerTest::cleanup()

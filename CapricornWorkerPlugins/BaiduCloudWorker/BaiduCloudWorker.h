@@ -23,10 +23,10 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject, public Ba
     // Variables
     QString accessToken;
     QMap<QString, QString> requestUrlPatterns;
-    static const qint64 BaseBlockSize = 32 * PFile::MegabyteSize;
-    static const qint64 MaxBlockSize = 2 * PFile::GigabyteSize;
-    static const qint64 MaxBlockCount = 1024;
-    static const qint64 MaxThreadCount = 8;
+    const qint64 BaseBlockSize = 32 * PFile::MegabyteSize;
+    const qint64 MaxBlockSize = 2 * PFile::GigabyteSize;
+    const qint64 MaxBlockCount = 1024;
+    const qint64 MaxThreadCount = 8;
     QJsonObject settings;
     PNetworkAccessManager *manager = new PNetworkAccessManager();
     // Temp variables
@@ -40,15 +40,14 @@ public:
 private slots:
     void showProgress(qint64 bs, qint64 bt);
 private:
-    qint64 static getBlockSize(qint64 fileSize);
+    qint64 getBlockSize(qint64 fileSize);
+    std::map<QString, QString> getFileInfos(const QString &localPath);
     ResultType uploadFileRapid(const QString &remotePath, const QString &localPath);
     ResultType uploadFileDirect(QString remotePath, QString localPath);
     ResultType uploadFileByBlockMultithread(QString remotePath, QString localPath);
     ResultType uploadFileByBlockSinglethread(QString remotePath, QString localPath);
     bool verifyFile(const QString &remotePath);
     QString uploadBlock(const QByteArray &data);
-    QString uploadBlockFromFile(const QString &filePath, qint64 startIndex, qint64 length);
-    QString uploadBlockFromMyFile(const std::tuple<QString, qint64, qint64> &parameters);
     ResultType mergeBlocks(QString remotePath, QStringList blockHashList);
 };
 

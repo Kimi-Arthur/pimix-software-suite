@@ -11,13 +11,16 @@
 #include <QStringList>
 #include <QtConcurrent/QtConcurrent>
 #include "PLogger.h"
+#include "PChecksum.h"
 #include <tuple>
 #include "PLogger.h"
 
+using namespace Pt::Core;
 BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     : logger(_logger)
 {
-    logger->trace("[MethodIn ] BaiduCloudWorker::BaiduCloudWorker");
+    logger->displayBound = PLogger::LogType::TraceLog;
+    logger->trace("MI BaiduCloudWorker::BaiduCloudWorker");
     manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
@@ -25,7 +28,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     auto value = settingsFile.readAll();
     settings = QJsonDocument::fromJson(value).object();
     qDebug() << settings;
-    logger->trace("[MethodOut] BaiduCloudWorker::BaiduCloudWorker");
+    logger->trace("MO BaiduCloudWorker::BaiduCloudWorker");
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
@@ -35,16 +38,19 @@ CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, Q
 
 CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
 {
-    logger->trace("[MethodIn ] BaiduCloudWorker::uploadFile");
+    logger->trace("MI BaiduCloudWorker::uploadFile");
     QFile f(localPath);
     if (!f.open(QIODevice::ReadOnly))
         return Failure;
     qint64 fileSize = f.size();
     f.close();
+    // Try rapid upload first
+    if (uploadFileRapid(remotePath, localPath) == CapricornWorker::Success)
+        return CapricornWorker::Success;
     if (fileSize <= BaseBlockSize)
         uploadFileDirect(remotePath, localPath);
     else uploadFileByBlockSinglethread(remotePath, localPath);
-    logger->trace("[MethodOut] BaiduCloudWorker::uploadFile");
+    logger->trace("MO BaiduCloudWorker::uploadFile");
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
@@ -75,6 +81,33 @@ qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
         return 0;
 }
 
+std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPath)
+{
+    logger->trace("MI BaiduCloudWorker::getFileInfo");
+    std::map<QString, QString> result;
+    QFile f(localPath);
+    if (f.open(QIODevice::ReadOnly)) {
+        qint64 fileSize = f.size();
+        result["ContentLength"] = QString::number(fileSize);
+        result["SliceMd5"] = QCryptographicHash::hash(f.read(256 * PFile::KilobyteSize), QCryptographicHash::Md5).toHex();
+        f.seek(0);
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        PChecksum crc(PChecksum::Algorithm::Crc32);
+        QByteArray block = f.read(BaseBlockSize);
+        while (!block.isEmpty()) {
+            md5.addData(block);
+            crc.addData(block);
+            block = f.read(BaseBlockSize);
+        }
+        result["ContentMd5"] = md5.result().toHex();
+        result["ContentCrc32"] = crc.result().toHex();
+    }
+    logger->debug(result["ContentMd5"]);
+    logger->debug(result["ContentCrc32"]);
+    logger->trace("MO BaiduCloudWorker::getFileInfo");
+    return result;
+}
+
 CapricornWorker::ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
 {
     std::map<QString, QString> parameters = {
@@ -84,8 +117,10 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileRapid(const QString &rem
     };
     std::map<QString, QString> fileInfos = getFileInfos(localPath);
     parameters.insert(fileInfos.begin(), fileInfos.end());
+    foreach (auto item, parameters)
+        qDebug() << item.first << item.second;
     manager->executeNetworkRequest(HttpVerb::Post, settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters);
-
+    return CapricornWorker::Success;
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localPath)
@@ -114,9 +149,7 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QStri
     //fileToUpload.close();
     QList<QPair<qint64, qint64>> blockInformationList;
     for (qint64 index = 0; index < fileSize; index += BaseBlockSize) {
-        // Temp workaround for MinGW bug
-        qint64 sizeA = BaseBlockSize, sizeB = fileSize - index;
-        blockInformationList.append({index, qMin(sizeA, sizeB)});
+        blockInformationList.append({index, qMin(BaseBlockSize, fileSize - index)});
     }
 
     //QtConcurrent::blockingMapped(blockInformationList,
@@ -211,20 +244,6 @@ QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
     reply->deleteLater();
     qDebug() << "result" << blockUploadResult;
     return blockUploadResult["md5"].toString();
-}
-
-QString BaiduCloudWorker::uploadBlockFromFile(const QString &filePath, qint64 startIndex, qint64 length)
-{
-    QFile fileToUpload(filePath);
-    if (!fileToUpload.open(QIODevice::ReadOnly))
-        return "";
-    fileToUpload.seek(startIndex);
-    return uploadBlock(fileToUpload.read(length));
-}
-
-QString BaiduCloudWorker::uploadBlockFromMyFile(const std::tuple<QString, qint64, qint64> &parameters)
-{
-    return uploadBlockFromFile(std::get<0>(parameters), std::get<1>(parameters), std::get<2>(parameters));
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
