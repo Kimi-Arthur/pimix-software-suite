@@ -1,6 +1,14 @@
 #include "PFile.h"
 #include <QFile>
 
+const qint64 PFile::ByteSize = 1;
+const qint64 PFile::KilobyteSize = ByteSize << 10;
+const qint64 PFile::MegabyteSize = ByteSize << 20;
+const qint64 PFile::GigabyteSize = ByteSize << 30;
+const qint64 PFile::TerabyteSize = ByteSize << 40;
+const qint64 PFile::PetabyteSize = ByteSize << 50;
+const qint64 PFile::ExabyteSize = ByteSize << 60;
+const qint64 PFile::BlockSize = 4 * MegabyteSize;
 
 PFile::PFile()
 {
@@ -55,9 +63,7 @@ int PFile::splitFile(QString inputFileName, QList<QPair<QString, qint64> > outpu
         }
         qint64 blockCount = (info.second - 1) / BlockSize + 1;
         for (qint64 i = 0; i < blockCount; ++i) {
-            // Temp workaroud for MinGW bug
-            qint64 sizeA = BlockSize, sizeB = info.second - i * BlockSize;
-            outputFile.write(inputFile.read(qMin(sizeA, sizeB)));
+            outputFile.write(inputFile.read(qMin(BlockSize, info.second - i * BlockSize)));
             outputFile.flush();
         }
         outputFile.close();

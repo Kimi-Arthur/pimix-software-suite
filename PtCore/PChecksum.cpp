@@ -1,5 +1,9 @@
 #include "PChecksum.h"
+#include <QBitArray>
 #include <QMap>
+#include <zlib.h>
+
+using namespace Pt::Core;
 
 class PChecksumMethod
 {
@@ -12,27 +16,33 @@ public:
 
 class PChecksumMethodCrc32 : public PChecksumMethod
 {
+    quint32 state;
+
 public:
     PChecksumMethodCrc32()
         : PChecksumMethod()
     {
-
+        reset();
     }
 
     virtual void reset()
     {
-
+        state = 0;
     }
 
     virtual void addData(const QByteArray &data)
     {
-
+        state = crc32(state, (const unsigned char *)data.constData(), data.length());
     }
 
     virtual QByteArray result() const
     {
-        return QByteArray();
+        QByteArray result(4, 0);
+        for (int i = 0; i < 4; ++i)
+            result[4 - i - 1] = state >> (i << 3) & 0xFF;
+        return result;
     }
+
 };
 
 QMap<PChecksum::Algorithm, std::function<PChecksumMethod *()>> PChecksum::checksumMethods =

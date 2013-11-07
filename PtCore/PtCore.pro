@@ -34,6 +34,8 @@ HEADERS += PtCore.h\
     PChecksum.h \
     PtCore_global.h
 
+LIBS += -lz
+
 unix:!symbian {
     maemo5 {
         target.path = /opt/usr/lib

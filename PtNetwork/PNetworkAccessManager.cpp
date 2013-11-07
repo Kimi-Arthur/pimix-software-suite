@@ -24,6 +24,7 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
     for (auto parameter : parameters)
         urlPattern.replace(QString("{%1}").arg(parameter.first), parameter.second);
 
+    qDebug() << urlPattern;
     QNetworkReply *reply;
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
         qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();

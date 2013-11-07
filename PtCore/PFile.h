@@ -6,14 +6,14 @@
 class PTCORESHARED_EXPORT PFile
 {
 public:
-    static const qint64 ByteSize = 1;
-    static const qint64 KilobyteSize = ByteSize << 10;
-    static const qint64 MegabyteSize = ByteSize << 20;
-    static const qint64 GigabyteSize = ByteSize << 30;
-    static const qint64 TerabyteSize = ByteSize << 40;
-    static const qint64 PetabyteSize = ByteSize << 50;
-    static const qint64 ExabyteSize = ByteSize << 60;
-    static const qint64 BlockSize = 4 * MegabyteSize;
+    static const qint64 ByteSize;
+    static const qint64 KilobyteSize;
+    static const qint64 MegabyteSize;
+    static const qint64 GigabyteSize;
+    static const qint64 TerabyteSize;
+    static const qint64 PetabyteSize;
+    static const qint64 ExabyteSize;
+    static const qint64 BlockSize;
     PFile();
     static int mergeFiles(QStringList inputFileNameList, QString outputFileName);
     static int splitFile(QString inputFileName, QList<QPair<QString, qint64> > outputFileInfos);
