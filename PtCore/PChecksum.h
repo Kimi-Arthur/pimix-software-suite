@@ -3,18 +3,20 @@
 
 #include "PtCore_global.h"
 
-class PChecksumMethod;
 
 template <class Key, class T>
 class QMap;
+
+class PChecksumMethod;
+
+namespace Pt {
+namespace Core {
 
 class PTCORESHARED_EXPORT PChecksum
 {
 public:
     enum class Algorithm {
-        Crc16,
-        Crc32,
-        Crc64
+        Crc32
     };
 
     PChecksum(Algorithm method);
@@ -28,5 +30,8 @@ private:
     PChecksumMethod *checksumMethod;
     Algorithm methodType;
 };
+
+}
+}
 
 #endif // PCHECKSUM_H
