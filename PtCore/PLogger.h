@@ -32,6 +32,14 @@ public:
     PLogger();
 
     // Public Methods
+
+    /**
+     * Centric log process logic
+     *
+     * @param content Main log content
+     * @param objectName If it's not empty, the content will be displayed like "objectName = Type(content)"
+     * @param logType The log's type, similar to log level.
+     */
     template<class T>
     void log(const T &content, const QString &objectName = "", LogType logType = LogType::TraceLog) const
     {
@@ -82,6 +90,16 @@ public:
     inline void fatal(const T &content, const QString &objectName = "") const
     {
         log(content, objectName, LogType::FatalLog);
+    }
+
+    inline void logMethodIn(const QString &className, const QString &methodName)
+    {
+        trace(">>> " + className + "." + methodName);
+    }
+
+    inline void logMethodOut(const QString &className, const QString &methodName)
+    {
+        trace("<<< " + className + "." + methodName);
     }
 
 private:
