@@ -2,7 +2,7 @@
 #define PTNETWORK_H
 
 #include "PtNetwork_global.h"
-#include <QNetworkProxy>
+//#include <QNetworkProxy>
 #include <QString>
 #include <QRegularExpression>
 
@@ -10,7 +10,7 @@
 namespace Pt {
 namespace Network {
 
-PTNETWORKSHARED_EXPORT QNetworkProxy getProxy(const QString &proxyString);
+//PTNETWORKSHARED_EXPORT QNetworkProxy getProxy(const QString &proxyString);
 enum class HttpVerb
 {
     Get,

@@ -17,6 +17,8 @@
 
 #endif
 
+#define QSL QStringLiteral
+
 #if defined(PTCORE_LIBRARY)
 #  define PTCORESHARED_EXPORT Q_DECL_EXPORT
 #else
