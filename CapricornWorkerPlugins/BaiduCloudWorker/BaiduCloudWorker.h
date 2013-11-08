@@ -1,11 +1,9 @@
 #ifndef BAIDUCLOUDWORKER_H
 #define BAIDUCLOUDWORKER_H
 
-#include "PLogger.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMap>
-#include <QNetworkAccessManager>
 #include "baiducloudworker_global.h"
 #include "PFile.h"
 #include "PtCore.h"
@@ -37,6 +35,7 @@ public:
     ResultType downloadFile(QString remotePath, QString localPath);
     ResultType uploadFile(QString remotePath, QString localPath);
     ResultType removePath(QString remotePath);
+    QStringList getFileList();
 private slots:
     void showProgress(qint64 bs, qint64 bt);
 private:

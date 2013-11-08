@@ -20,7 +20,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     : logger(_logger)
 {
     logger->displayBound = PLogger::LogType::TraceLog;
-    logger->trace("MI BaiduCloudWorker::BaiduCloudWorker");
+    logger->logMethodIn("BaiduCloudWorker", "BaiduCloudWorker");
     manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
     QFile settingsFile("U:/BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
@@ -28,7 +28,8 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     auto value = settingsFile.readAll();
     settings = QJsonDocument::fromJson(value).object();
     qDebug() << settings;
-    logger->trace("MO BaiduCloudWorker::BaiduCloudWorker");
+
+    logger->logMethodOut("BaiduCloudWorker", "BaiduCloudWorker");
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
@@ -38,7 +39,9 @@ CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, Q
 
 CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
 {
-    logger->trace("MI BaiduCloudWorker::uploadFile");
+    logger->logMethodIn("BaiduCloudWorker", "uploadFile");
+
+    logger->debug(remotePath, "remotePath");
     QFile f(localPath);
     if (!f.open(QIODevice::ReadOnly))
         return Failure;
@@ -50,11 +53,13 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QSt
     if (fileSize <= BaseBlockSize)
         uploadFileDirect(remotePath, localPath);
     else uploadFileByBlockSinglethread(remotePath, localPath);
-    logger->trace("MO BaiduCloudWorker::uploadFile");
+
+    logger->logMethodOut("BaiduCloudWorker", "uploadFile");
 }
 
 CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
 {
+    logger->logMethodIn("BaiduCloudWorker", "removePath");
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -63,7 +68,34 @@ CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
 
     manager->executeNetworkRequest(HttpVerb::Post, settings["RemovePath"].toObject()["UrlPattern"].toString(), parameters);
     ResultType result = Success;
-    qDebug() << "finished";
+
+    logger->logMethodOut("BaiduCloudWorker", "removePath");
+    return result;
+}
+
+QStringList BaiduCloudWorker::getFileList()
+{
+    logger->logMethodIn("BaiduCloudWorker", "getFileList");
+    std::map<QString, QString> parameters = {
+        {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()},
+        {"Cursor", "null"}
+    };
+
+    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Get, settings["DiffFileList"].toObject()["UrlPattern"].toString(), parameters);
+
+    QJsonObject diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
+    reply->deleteLater();
+    QStringList result = diffFileListResult["entries"].toObject().keys();
+    while (diffFileListResult["has_more"].toBool()) {
+        parameters["Cursor"] = diffFileListResult["cursor"].toString();
+        reply = manager->executeNetworkRequest(HttpVerb::Get, settings["DiffFileList"].toObject()["UrlPattern"].toString(), parameters);
+        diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
+        reply->deleteLater();
+        result.append(diffFileListResult["entries"].toObject().keys());
+    }
+    result.replaceInStrings(QRegularExpression("^/apps/Pimix/"), "");
+    logger->debug(result, "File List");
+    logger->logMethodOut("BaiduCloudWorker", "getFileList");
     return result;
 }
 
@@ -83,7 +115,7 @@ qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
 
 std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPath)
 {
-    logger->trace("MI BaiduCloudWorker::getFileInfo");
+    logger->logMethodIn("BaiduCloudWorker", "getFileInfos");
     std::map<QString, QString> result;
     QFile f(localPath);
     if (f.open(QIODevice::ReadOnly)) {
@@ -104,7 +136,7 @@ std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPa
     }
     logger->debug(result["ContentMd5"]);
     logger->debug(result["ContentCrc32"]);
-    logger->trace("MO BaiduCloudWorker::getFileInfo");
+    logger->logMethodOut("BaiduCloudWorker", "getFileInfos");
     return result;
 }
 
