@@ -29,15 +29,27 @@ public:
         return PSerializerInformation<T>::serializeFunctions.value(serializationType)(value);
     }
 
+    template<class T>
+    static inline QString serialize(const QList<T> &value, PSerializationType serializationType = PSerializationType::Normal)
+    {
+        QString result = "[";
+        foreach (auto &v, value) {
+            result += PSerializer::serialize(v, serializationType) + ",";
+        }
+        result.chop(1);
+        result.append("]");
+
+        return result;
+    }
+
+    static inline QString serialize(const QStringList value, PSerializationType serializationType = PSerializationType::Normal)
+    {
+        return PSerializer::serialize(QList<QString>(value));
+    }
+
     static inline QString serialize(const char *value, PSerializationType serializationType = PSerializationType::Normal)
     {
         return value;
-    }
-
-    template<class T>
-    static inline T deserialize(const QString &data, PSerializationType serializationType = PSerializationType::Normal)
-    {
-        return PSerializerInformation<T>::deserializeFunctions.value(serializationType)(data);
     }
 };
 
@@ -51,10 +63,10 @@ public:
     QMap<Pt::Core::PSerializationType, std::function<T(const QString&)>> \
     Pt::Core::PSerializerInformation<T>::deserializeFunctions
 
-#define Decl_SerializeFunctionEntry(ST, T, C...) \
+#define DeclEntry_SerializeFunction(ST, T, C...) \
     {Pt::Core::PSerializationType::ST, [](const T &value) -> QString { C } }
 
-#define Decl_DeserializeFunctionEntry(ST, T, C...) \
+#define DeclEntry_DeserializeFunction(ST, T, C...) \
     {Pt::Core::PSerializationType::ST, [](const QString &data) -> T { C } }
 
 // EnumSerialization
@@ -67,9 +79,28 @@ public:
     static QMap<T, QString> valueToStringMap;
 };
 
+#define DeclStart_EnumSTVM(T) \
+    template<> \
+    QMap<QString, T> EnumSerializer<T>::stringToValueMap
+
+#define DeclEntry_EnumSTVM(T, V) \
+    {#V, T::V}
+
+#define DeclStart_EnumVTSM(T) \
+    template<> \
+    QMap<T, QString> EnumSerializer<T>::valueToStringMap
+
+#define DeclEntry_EnumVTSM(T, V) \
+    {T::V, #V}
+
 #define Decl_Enum_Serializer(T) \
-    Decl_DeserializeFunction(T, return Pt::Core::EnumSerializer<T>::stringToValueMap.value(s); ) \
-    Decl_SerializeFunction(T, return Pt::Core::EnumSerializer<T>::valueToStringMap.value(s); )
+    DeclStart_SerializeFunctions(T) = { \
+        DeclEntry_SerializeFunction(Normal, T, return Pt::Core::EnumSerializer<T>::valueToStringMap.value(value); ) \
+    }; \
+    DeclStart_DeserializeFunctions(T) = { \
+        DeclEntry_DeserializeFunction(Normal, T, return Pt::Core::EnumSerializer<T>::stringToValueMap.value(data); ) \
+    };
+
 }
 }
 

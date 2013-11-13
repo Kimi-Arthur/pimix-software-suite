@@ -5,7 +5,7 @@
 
 DeclStart_SerializeFunctions(PJsonValue) =
 {
-    Decl_SerializeFunctionEntry(Normal, PJsonValue, return QString::fromUtf8(value.toDocument().toJson(QJsonDocument::JsonFormat::Compact)); )
+    DeclEntry_SerializeFunction(Normal, PJsonValue, return QString::fromUtf8(value.toDocument().toJson(QJsonDocument::JsonFormat::Compact)); )
 };
 
 PJsonValue PJsonValue::operator [](QString key) const
