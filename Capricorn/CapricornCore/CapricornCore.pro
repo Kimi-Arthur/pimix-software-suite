@@ -32,9 +32,9 @@ unix:!symbian {
     INSTALLS += target
 }
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtCore/release/ -lPtCore
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtCore/debug/ -lPtCore
-else:unix: LIBS += -L$$OUT_PWD/../../Library/PtCore/ -lPtCore
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtCore/release/ -lPtCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtCore/debug/ -lPtCore
+else:unix: LIBS += -L$$SRC_DIR/Library/PtCore/ -lPtCore
 
-INCLUDEPATH += $$PWD/../../Library/PtCore
-DEPENDPATH += $$PWD/../../Library/PtCore
+INCLUDEPATH += $$SRC_DIR/Library/PtCore
+DEPENDPATH += $$SRC_DIR/Library/PtCore
