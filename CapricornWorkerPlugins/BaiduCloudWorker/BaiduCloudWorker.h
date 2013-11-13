@@ -16,7 +16,7 @@ using namespace Pt::Core;
 
 using namespace Pt::Network;
 
-class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject, public BaseCapricornWorker
+class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject
 {
     // Variables
     QString accessToken;
@@ -50,10 +50,5 @@ private:
     ResultType mergeBlocks(QString remotePath, QStringList blockHashList);
 };
 
-class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorkerFactory : public QObject, public BaseCapricornWorkerFactory
-{
-public:
-    BaiduCloudWorkerFactory();
-};
 
 #endif // BAIDUCLOUDWORKER_H

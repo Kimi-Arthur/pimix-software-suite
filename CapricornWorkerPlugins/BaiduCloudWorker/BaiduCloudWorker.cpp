@@ -32,24 +32,24 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     logger->logMethodOut("BaiduCloudWorker", "BaiduCloudWorker");
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
+ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
 {
 
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
+ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
 {
     logger->logMethodIn("BaiduCloudWorker", "uploadFile");
 
     logger->debug(remotePath, "remotePath");
     QFile f(localPath);
     if (!f.open(QIODevice::ReadOnly))
-        return Failure;
+        return ResultType::Failure;
     qint64 fileSize = f.size();
     f.close();
     // Try rapid upload first
-    if (uploadFileRapid(remotePath, localPath) == CapricornWorker::Success)
-        return CapricornWorker::Success;
+    if (uploadFileRapid(remotePath, localPath) == ResultType::Success)
+        return ResultType::Success;
     if (fileSize <= BaseBlockSize)
         uploadFileDirect(remotePath, localPath);
     else uploadFileByBlockSinglethread(remotePath, localPath);
@@ -57,7 +57,7 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFile(QString remotePath, QSt
     logger->logMethodOut("BaiduCloudWorker", "uploadFile");
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
+ResultType BaiduCloudWorker::removePath(QString remotePath)
 {
     logger->logMethodIn("BaiduCloudWorker", "removePath");
     std::map<QString, QString> parameters = {
@@ -67,7 +67,7 @@ CapricornWorker::ResultType BaiduCloudWorker::removePath(QString remotePath)
     };
 
     manager->executeNetworkRequest(HttpVerb::Post, settings["RemovePath"].toObject()["UrlPattern"].toString(), parameters);
-    ResultType result = Success;
+    ResultType result = ResultType::Success;
 
     logger->logMethodOut("BaiduCloudWorker", "removePath");
     return result;
@@ -140,7 +140,7 @@ std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPa
     return result;
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
+ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
 {
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
@@ -152,11 +152,12 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileRapid(const QString &rem
     foreach (auto item, parameters)
         qDebug() << item.first << item.second;
     manager->executeNetworkRequest(HttpVerb::Post, settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters);
-    return CapricornWorker::Success;
+    return ResultType::Success;
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localPath)
+ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localPath)
 {
+    logger->logMethodIn("BaiduCloudWorker", "uploadFileDirect");
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -164,19 +165,20 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileDirect(QString remotePat
     };
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
-        return Failure;
+        return ResultType::Failure;
     manager->executeNetworkRequest(HttpVerb::Put, settings["UploadFileDirect"].toObject()["UrlPattern"].toString(), parameters, fileToUpload.readAll());
 
-    ResultType result = Success;
-    qDebug() << "finished";
+    ResultType result = ResultType::Success;
+    logger->debug(result, "result");
+    logger->logMethodOut("BaiduCloudWorker", "uploadFileDirect");
     return result;
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QString localPath)
+ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QString localPath)
 {
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
-        return Failure;
+        return ResultType::Failure;
     qint64 fileSize = fileToUpload.size();
     //fileToUpload.close();
     QList<QPair<qint64, qint64>> blockInformationList;
@@ -228,11 +230,11 @@ CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QStri
     return mergeBlocks(remotePath, blockResultList);
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
+ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
 {
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
-        return Failure;
+        return ResultType::Failure;
     QStringList blockHashList;
 
     QByteArray data = fileToUpload.read(BaseBlockSize);
@@ -278,7 +280,7 @@ QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
     return blockUploadResult["md5"].toString();
 }
 
-CapricornWorker::ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
+ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
 {
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
@@ -289,7 +291,7 @@ CapricornWorker::ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QS
     param["block_list"] = QJsonArray::fromStringList(blockHashList);
     manager->executeNetworkRequest(HttpVerb::Post, settings["MergeBlocks"].toObject()["UrlPattern"].toString(), parameters , QByteArray("param=") + QJsonDocument(param).toJson());
 
-    ResultType result = Success;
+    ResultType result = ResultType::Success;
     qDebug() << "finished";
     return result;
 }
