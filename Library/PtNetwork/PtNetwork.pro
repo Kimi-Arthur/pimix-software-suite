@@ -8,6 +8,8 @@ QT       += network
 
 QT       -= gui
 
+DLLDESTDIR = $$BIN_DIR
+
 TARGET = PtNetwork
 TEMPLATE = lib
 

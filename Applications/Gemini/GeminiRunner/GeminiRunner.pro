@@ -14,33 +14,34 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+DESTDIR = $$BIN_DIR
 
 SOURCES += main.cpp
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Capricorn/CapricornWorkerPlugins/BaiduCloudWorker/release/ -lBaiduCloudWorker
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Capricorn/CapricornWorkerPlugins/BaiduCloudWorker/debug/ -lBaiduCloudWorker
-else:unix: LIBS += -L$$OUT_PWD/../../Capricorn/CapricornWorkerPlugins/BaiduCloudWorker/ -lBaiduCloudWorker
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Capricorn/CapricornWorkerPlugins/BaiduCloudWorker/release/ -lBaiduCloudWorker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Capricorn/CapricornWorkerPlugins/BaiduCloudWorker/debug/ -lBaiduCloudWorker
+else:unix: LIBS += -L$$SRC_DIR/Capricorn/CapricornWorkerPlugins/BaiduCloudWorker/ -lBaiduCloudWorker
 
-INCLUDEPATH += $$PWD/../../Capricorn/CapricornWorkerPlugins/BaiduCloudWorker
-DEPENDPATH += $$PWD/../../Capricorn/CapricornWorkerPlugins/BaiduCloudWorker
+INCLUDEPATH += $$SRC_DIR/Capricorn/CapricornWorkerPlugins/BaiduCloudWorker
+DEPENDPATH += $$SRC_DIR/Capricorn/CapricornWorkerPlugins/BaiduCloudWorker
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtCore/release/ -lPtCore
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtCore/debug/ -lPtCore
-else:unix: LIBS += -L$$OUT_PWD/../../Library/PtCore/ -lPtCore
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtCore/release/ -lPtCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtCore/debug/ -lPtCore
+else:unix: LIBS += -L$$SRC_DIR/Library/PtCore/ -lPtCore
 
-INCLUDEPATH += $$PWD/../../Library/PtCore
-DEPENDPATH += $$PWD/../../Library/PtCore
+INCLUDEPATH += $$SRC_DIR/Library/PtCore
+DEPENDPATH += $$SRC_DIR/Library/PtCore
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtNetwork/release/ -lPtNetwork
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtNetwork/debug/ -lPtNetwork
-else:unix: LIBS += -L$$OUT_PWD/../../Library/PtNetwork/ -lPtNetwork
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtNetwork/release/ -lPtNetwork
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtNetwork/debug/ -lPtNetwork
+else:unix: LIBS += -L$$SRC_DIR/Library/PtNetwork/ -lPtNetwork
 
-INCLUDEPATH += $$PWD/../../Library/PtNetwork
-DEPENDPATH += $$PWD/../../Library/PtNetwork
+INCLUDEPATH += $$SRC_DIR/Library/PtNetwork
+DEPENDPATH += $$SRC_DIR/Library/PtNetwork
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Capricorn/CapricornCore/release/ -lCapricornCore
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Capricorn/CapricornCore/debug/ -lCapricornCore
-else:unix: LIBS += -L$$OUT_PWD/../../Capricorn/CapricornCore/ -lCapricornCore
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Capricorn/CapricornCore/release/ -lCapricornCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Capricorn/CapricornCore/debug/ -lCapricornCore
+else:unix: LIBS += -L$$SRC_DIR/Capricorn/CapricornCore/ -lCapricornCore
 
-INCLUDEPATH += $$PWD/../../Capricorn/CapricornCore
-DEPENDPATH += $$PWD/../../Capricorn/CapricornCore
+INCLUDEPATH += $$SRC_DIR/Capricorn/CapricornCore
+DEPENDPATH += $$SRC_DIR/Capricorn/CapricornCore

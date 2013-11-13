@@ -18,7 +18,7 @@ SOURCES += GeneralNetworkWorker.cpp
 HEADERS += GeneralNetworkWorker.h\
         generalnetworkworker_global.h
 
-DLLDESTDIR = $$PWD/../../bin
+DLLDESTDIR = $$BIN_DIR
 
 unix:!symbian {
     maemo5 {

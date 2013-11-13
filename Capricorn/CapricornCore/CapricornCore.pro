@@ -21,7 +21,7 @@ HEADERS += CapricornCore.h\
     CapricornWorker.h \
     BaseCapricornWorker.h
 
-DLLDESTDIR = $$PWD/../bin
+DLLDESTDIR = $$BIN_DIR
 
 unix:!symbian {
     maemo5 {

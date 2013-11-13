@@ -18,7 +18,7 @@ SOURCES += BaiduCloudWorker.cpp
 HEADERS += BaiduCloudWorker.h\
         baiducloudworker_global.h
 
-DLLDESTDIR = $$PWD/../../bin
+DLLDESTDIR = $$BIN_DIR
 
 unix:!symbian {
     maemo5 {

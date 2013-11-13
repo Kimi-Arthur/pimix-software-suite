@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    ..\Library \
+    $$SRC_DIR/Library \
     CapricornCore \
     CapricornWorkerPlugins \
     ConsoleCapricornRunner \
