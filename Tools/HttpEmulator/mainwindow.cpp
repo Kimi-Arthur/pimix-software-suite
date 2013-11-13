@@ -79,7 +79,7 @@ void MainWindow::on_requestButton_clicked()
         cookieJar.insertCookie(o);
     }
 
-    manager.setProxy(getProxy(ui->proxyLine->text()));
+    //manager.setProxy(getProxy(ui->proxyLine->text()));
     qDebug() << manager.proxy();
     auto request = QNetworkRequest(url);
     //request.setHeader(QNetworkRequest::UserAgentHeader, "test");

@@ -11,6 +11,8 @@ TEMPLATE = lib
 
 DEFINES += PTGUI_LIBRARY
 
+DLLDESTDIR = $$BIN_DIR
+
 SOURCES += \
     PFileChooserWidget.cpp
 

@@ -12,7 +12,7 @@ CONFIG += C++11
 TARGET = HttpEmulator
 TEMPLATE = app
 
-DESTDIR = $$DEST_BASE
+DESTDIR = $$BASE_DIR"bin/"
 
 SOURCES += main.cpp\
         MainWindow.cpp

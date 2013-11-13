@@ -11,6 +11,8 @@ TEMPLATE = lib
 
 CONFIG += precompile_header
 
+DLLDESTDIR = $$BIN_DIR
+
 PRECOMPILED_HEADER = PtCore_global.h
 
 DEFINES += PTCORE_LIBRARY
