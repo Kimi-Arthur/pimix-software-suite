@@ -15,29 +15,23 @@ void Pt::Network::PNetworkAccessManager::setRetryPolicy(Pt::Network::PNetworkRet
 }
 
 QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVerb verb,
-                                                                         QString urlPattern,
-                                                                         const std::map<QString, QString> &parameters,
+                                                                         QString requestUrl,
                                                                          const QByteArray &data,
                                                                          PNetworkRetryPolicy *retryPolicy)
 {
-
-    for (auto parameter : parameters)
-        urlPattern.replace(QString("{%1}").arg(parameter.first), parameter.second);
-
-    qDebug() << urlPattern;
     QNetworkReply *reply;
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
         qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
         //qDebug() << QString("Tried %1 times").arg(i++);
         switch (verb) {
         case HttpVerb::Get:
-            reply = get(QNetworkRequest(urlPattern));
+            reply = get(QNetworkRequest(requestUrl));
             break;
         case HttpVerb::Post:
-            reply = post(QNetworkRequest(urlPattern), data);
+            reply = post(QNetworkRequest(requestUrl), data);
             break;
         case HttpVerb::Put:
-            reply = put(QNetworkRequest(urlPattern), data);
+            reply = put(QNetworkRequest(requestUrl), data);
             break;
         case HttpVerb::Head:
         case HttpVerb::Delete:
@@ -61,10 +55,9 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
     return reply;
 }
 
-QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(Pt::Network::HttpVerb verb, QString urlPattern, const std::map<QString, QString> &parameters, const QByteArray &data)
+QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(Pt::Network::HttpVerb verb, QString requestUrl, const QByteArray &data)
 {
-    qDebug() << defaultRetryPolicy->timeout();
-    return executeNetworkRequest(verb, urlPattern, parameters, data, defaultRetryPolicy->clone());
+    return executeNetworkRequest(verb, requestUrl, data, defaultRetryPolicy->clone());
 }
 
 Pt::Network::PNetworkAccessManager::~PNetworkAccessManager()

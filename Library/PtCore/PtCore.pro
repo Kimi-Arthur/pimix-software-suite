@@ -22,7 +22,8 @@ SOURCES += PtCore.cpp \
     PJsonValue.cpp \
     PLogger.cpp \
     PSerializer.cpp \
-    PChecksum.cpp
+    PChecksum.cpp \
+    PString.cpp
 
 HEADERS += PtCore.h\
     PSettings.h \
@@ -32,7 +33,8 @@ HEADERS += PtCore.h\
     PLogger.h \
     PSerializer.h \
     PChecksum.h \
-    PtCore_global.h
+    PtCore_global.h \
+    PString.h
 
 LIBS += -lz
 
