@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QString basePath = argv[1];
-//    QString basePath = "C:/Downloads/test";
+    qDebug() << basePath;
     while (true) {
         auto fl = getUpdatedFileList(basePath);
         foreach (auto f, fl) {
