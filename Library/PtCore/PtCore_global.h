@@ -14,6 +14,7 @@
 #include <QSet>
 #include <QDateTime>
 #include <QTextStream>
+#include <map>
 
 #endif
 

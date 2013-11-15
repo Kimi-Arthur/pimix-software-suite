@@ -18,10 +18,9 @@ class PTNETWORKSHARED_EXPORT PNetworkAccessManager : public QNetworkAccessManage
 public:
     explicit PNetworkAccessManager(QObject *parent = 0);
     void setRetryPolicy(PNetworkRetryPolicy *retryPolicy);
-    QNetworkReply *executeNetworkRequest(HttpVerb verb, QString urlPattern, const std::map<QString, QString> &parameters,
+    QNetworkReply *executeNetworkRequest(HttpVerb verb, QString requestUrl,
                                          const QByteArray &data, PNetworkRetryPolicy *retryPolicy);
-    QNetworkReply *executeNetworkRequest(HttpVerb verb, QString urlPattern,
-                                         const std::map<QString, QString> &parameters = std::map<QString, QString>(),
+    QNetworkReply *executeNetworkRequest(HttpVerb verb, QString requestUrl,
                                          const QByteArray &data = QByteArray());
 
     ~PNetworkAccessManager();
