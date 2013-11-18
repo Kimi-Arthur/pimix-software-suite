@@ -5,7 +5,12 @@
 
 DeclStart_SerializeFunctions(PJsonValue) =
 {
-    DeclEntry_SerializeFunction(Normal, PJsonValue, return QString::fromUtf8(value.toDocument().toJson(QJsonDocument::JsonFormat::Compact)); )
+    DeclEntry_SerializeFunction(Normal, PJsonValue, return PJsonValue::serialize(value); )
+};
+
+DeclStart_DeserializeFunctions(PJsonValue) =
+{
+    DeclEntry_DeserializeFunction(Normal, PJsonValue, return PJsonValue::deserialize(data); )
 };
 
 PJsonValue PJsonValue::operator [](QString key) const
@@ -40,6 +45,28 @@ QJsonDocument PJsonValue::toDocument() const
     }
 }
 
+QString PJsonValue::serialize(const PJsonValue &value)
+{
+    QJsonObject o;
+    o["o"] = value;
+    QString s = QString::fromUtf8(QJsonDocument(o).toJson(QJsonDocument::Compact));
+    // s = {"o": x}
+    s.chop(1);
+    // s = {"o": x
+    return s.mid(6);
+}
+
+PJsonValue PJsonValue::deserialize(const QString &data)
+{
+    QJsonObject o = QJsonDocument::fromJson((QSL("{\"o\": ") + data + QSL("}")).toUtf8()).object();
+    return PJsonValue(o["o"]);
+}
+
+int PJsonValue::toInt()
+{
+    if (isDouble())
+        return toDouble();
+}
 
 PJsonValue PJsonValueRef::operator [](QString key) const
 {

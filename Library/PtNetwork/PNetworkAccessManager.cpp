@@ -19,6 +19,7 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
                                                                          const QByteArray &data,
                                                                          PNetworkRetryPolicy *retryPolicy)
 {
+    qDebug() << requestUrl;
     QNetworkReply *reply;
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
         qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
