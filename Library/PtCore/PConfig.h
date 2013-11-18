@@ -5,6 +5,10 @@
 
 class PTCORESHARED_EXPORT PConfig
 {
+protected:
+    QString moduleName;
+    QStringList saerchPathList = {".", "~", "/etc"};
+    int currentPathIndex = 0;
 public:
     PConfig();
 };
