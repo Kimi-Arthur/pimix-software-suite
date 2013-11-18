@@ -1,27 +1,30 @@
 #include "PSerializer.h"
 #include <QStringList>
+#include "PJsonValue.h"
 
 using namespace Pt::Core;
 
 
 DeclStart_SerializeFunctions(qint64) =
 {
-    DeclEntry_SerializeFunction(Normal, qint64, return QString::number(value);)
+    DeclEntry_SerializeFunction(Normal, qint64, return QString::number(value); )
 };
 
 DeclStart_DeserializeFunctions(qint64) =
 {
-    DeclEntry_DeserializeFunction(Normal, qint64, return data.toLongLong();)
+    DeclEntry_DeserializeFunction(Normal, qint64, return data.toLongLong(); )
 };
 
 DeclStart_SerializeFunctions(int) =
 {
-    DeclEntry_SerializeFunction(Normal, int, return QString::number(value);)
+    DeclEntry_SerializeFunction(Normal, int, return QString::number(value);),
+    DeclEntry_SerializeFunction(JsonFormat, int, return PJsonValue::serialize(PJsonValue(value)); )
 };
 
 DeclStart_DeserializeFunctions(int) =
 {
-    DeclEntry_DeserializeFunction(Normal, int, return data.toInt();)
+    DeclEntry_DeserializeFunction(Normal, int, return data.toInt();),
+    DeclEntry_DeserializeFunction(JsonFormat, int, return PJsonValue::deserialize(data).toInt(); )
 };
 
 DeclStart_SerializeFunctions(QString) =

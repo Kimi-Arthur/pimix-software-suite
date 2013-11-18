@@ -17,6 +17,9 @@ public:
     PJsonValue operator [](int index) const;
     PJsonValueRef operator [](int index);
     QJsonDocument toDocument() const;
+    static QString serialize(const PJsonValue &value);
+    static PJsonValue deserialize(const QString &data);
+    int toInt();
 };
 
 class PTCORESHARED_EXPORT PJsonValueRef : public QJsonValueRef

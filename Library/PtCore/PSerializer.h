@@ -9,7 +9,7 @@ namespace Core {
 
 enum class PSerializationType
 {
-    Normal, LongFormat
+    Normal, LongFormat, JsonFormat
 };
 
 template<class T>
@@ -32,14 +32,11 @@ public:
     template<class T>
     static inline QString serialize(const QList<T> &value, PSerializationType serializationType = PSerializationType::Normal)
     {
-        QString result = "[";
+        QStringList items;
         foreach (auto &v, value) {
-            result += PSerializer::serialize(v, serializationType) + ",";
+            items.append(PSerializer::serialize(v, serializationType));
         }
-        result.chop(1);
-        result.append("]");
-
-        return result;
+        return "[" + items.join(", ") + "]";
     }
 
     static inline QString serialize(const QStringList value, PSerializationType serializationType = PSerializationType::Normal)
