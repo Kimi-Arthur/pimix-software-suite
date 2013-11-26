@@ -52,6 +52,9 @@ public:
         foreach (auto parameter, parameters)
             resultLog.replace("{" + parameter.first + "}", parameter.second);
 
+        if (objectName != "")
+            resultLog.prepend(objectName + QSL(" = "));
+
         displayLog(resultLog, logType);
         writeLog(resultLog, logType);
     }

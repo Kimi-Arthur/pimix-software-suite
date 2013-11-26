@@ -21,7 +21,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
 {
     logger->displayBound = PLogger::LogType::TraceLog;
     logger->logMethodIn("BaiduCloudWorker", "BaiduCloudWorker");
-    manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
+    manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(600000, 5));
     QFile settingsFile("BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
         return;
@@ -149,6 +149,7 @@ std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPa
 
 ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
 {
+    logger->logMethodIn("BaiduCloudWorker", "uploadFileRapid");
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -158,9 +159,10 @@ ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QS
     parameters.insert(fileInfos.begin(), fileInfos.end());
     foreach (auto item, parameters)
         qDebug() << item.first << item.second;
-    auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters));
-    logger->log(QString::fromUtf8(reply->readAll()));
+    auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
+    logger->debug(QString::fromUtf8(reply->readAll()));
 
+    logger->logMethodOut("BaiduCloudWorker", "uploadFileRapid");
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }
 
@@ -254,9 +256,9 @@ ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, Q
         bc = 0;
         blockHashList.append(uploadBlock(data));
         ok = ok && !blockHashList.back().isEmpty();
-        qDebug() << QDateTime::currentDateTime();
-        qDebug() << blockHashList.count() << ok;
-        qDebug() << blockHashList;
+        logger->debug(blockHashList, "Finished blocks");
+        logger->debug(blockHashList.count(), "Finished blocks count");
+        logger->debug(ok, "Current status");
         data = fileToUpload.read(BaseBlockSize);
     }
     return mergeBlocks(remotePath, blockHashList);
@@ -276,21 +278,26 @@ bool BaiduCloudWorker::verifyFile(const QString &remotePath)
 
 QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
 {
-    qDebug() << "UploadBlock" << data.size();
+    logger->logMethodIn("BaiduCloudWorker", "uploadBlock");
+    logger->debug(data.size(), "UploadBlockSize");
     std::map<QString, QString> parameters = {
         {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
     };
     PNetworkAccessManager m;
-    m.setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(6000000, 5));
+    m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1200000));
     QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Put, PString::format(settings["UploadBlock"].toObject()["UrlPattern"].toString(), parameters), data);
-    QJsonObject blockUploadResult = QJsonDocument::fromJson(reply->readAll()).object();
+    auto result = reply->readAll();
     reply->deleteLater();
-    qDebug() << "result" << blockUploadResult;
+    QJsonObject blockUploadResult = QJsonDocument::fromJson(result).object();
+    logger->debug(QString::fromUtf8(result), "Block upload result");
+    logger->logMethodOut("BaiduCloudWorker", "uploadBlock");
     return blockUploadResult["md5"].toString();
 }
 
 ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
 {
+    logger->logMethodIn("BaiduCloudWorker", "mergeBlocks");
+
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -298,9 +305,12 @@ ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHa
     };
     QJsonObject param;
     param["block_list"] = QJsonArray::fromStringList(blockHashList);
-    manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["MergeBlocks"].toObject()["UrlPattern"].toString(), parameters), QByteArray("param=") + QJsonDocument(param).toJson());
+    QNetworkRequest request(PString::format(settings["MergeBlocks"].toObject()["UrlPattern"].toString(), parameters));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    auto reply = manager->executeNetworkRequest(HttpVerb::Post, request, QByteArray("param=") + QJsonDocument(param).toJson());
 
-    ResultType result = ResultType::Success;
-    qDebug() << "finished";
-    return result;
+    logger->debug(QString::fromUtf8(reply->readAll()));
+    logger->logMethodOut("BaiduCloudWorker", "mergeBlocks");
+
+    return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }

@@ -18,6 +18,10 @@ class PTNETWORKSHARED_EXPORT PNetworkAccessManager : public QNetworkAccessManage
 public:
     explicit PNetworkAccessManager(QObject *parent = 0);
     void setRetryPolicy(PNetworkRetryPolicy *retryPolicy);
+    QNetworkReply *executeNetworkRequest(HttpVerb verb, QNetworkRequest request,
+                                         const QByteArray &data, PNetworkRetryPolicy *retryPolicy);
+    QNetworkReply *executeNetworkRequest(HttpVerb verb, QNetworkRequest request,
+                                         const QByteArray &data = QByteArray());
     QNetworkReply *executeNetworkRequest(HttpVerb verb, QString requestUrl,
                                          const QByteArray &data, PNetworkRetryPolicy *retryPolicy);
     QNetworkReply *executeNetworkRequest(HttpVerb verb, QString requestUrl,
