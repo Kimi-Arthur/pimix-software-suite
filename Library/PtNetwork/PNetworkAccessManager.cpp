@@ -24,15 +24,17 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(HttpVer
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
         qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
         //qDebug() << QString("Tried %1 times").arg(i++);
+        QNetworkRequest request(requestUrl);
         switch (verb) {
         case HttpVerb::Get:
-            reply = get(QNetworkRequest(requestUrl));
+            reply = get(request);
             break;
         case HttpVerb::Post:
-            reply = post(QNetworkRequest(requestUrl), data);
+            request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
+            reply = post(request, data);
             break;
         case HttpVerb::Put:
-            reply = put(QNetworkRequest(requestUrl), data);
+            reply = put(request, data);
             break;
         case HttpVerb::Head:
         case HttpVerb::Delete:

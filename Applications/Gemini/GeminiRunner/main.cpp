@@ -9,7 +9,7 @@ BaiduCloudWorker w;
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
-    qDebug() << baseLocalPath;
+    qDebug() << "Base Local Path" << baseLocalPath;
     QDir d(baseLocalPath);
     QStringList result = d.entryList(QDir::Files).replaceInStrings(QRegularExpression("^"), baseLocalPath + "/");
     foreach (auto de, d.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
@@ -23,7 +23,7 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
     QStringList onlineList = w.getFileList();
     QStringList offlineList = getLocalFileList(baseLocalPath);
 
-    onlineList.replaceInStrings(QRegularExpression("^Backup/"), "");
+    onlineList.replaceInStrings(QRegularExpression("^Corp/"), "");
     offlineList.replaceInStrings(QRegularExpression("^" + baseLocalPath + "/"), "");
 
     qDebug() << offlineList;
@@ -37,7 +37,7 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
 
 void uploadFile(const QString &baseLocalPath, const QString &relativePath)
 {
-    w.uploadFile("Backup/" + relativePath, baseLocalPath + "/" + relativePath);
+    w.uploadFile("Corp/" + relativePath, baseLocalPath + "/" + relativePath);
 }
 
 int main(int argc, char *argv[])
