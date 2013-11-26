@@ -48,12 +48,14 @@ public:
             {"type", LogTypeStrings[logType]},
             {"datetime", QDateTime::currentDateTime().toString(Qt::ISODate)}
         };
+
+        if (objectName != "")
+            parameters["content"].prepend(objectName + QSL(" = "));
+
         QString resultLog = logPattern;
         foreach (auto parameter, parameters)
             resultLog.replace("{" + parameter.first + "}", parameter.second);
 
-        if (objectName != "")
-            resultLog.prepend(objectName + QSL(" = "));
 
         displayLog(resultLog, logType);
         writeLog(resultLog, logType);
