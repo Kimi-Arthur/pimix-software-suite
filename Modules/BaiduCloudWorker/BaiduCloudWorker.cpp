@@ -22,7 +22,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     logger->displayBound = PLogger::LogType::TraceLog;
     logger->logMethodIn("BaiduCloudWorker", "BaiduCloudWorker");
     manager->setRetryPolicy(PNetworkRetryPolicy::FixedIntervalRetryPolicy(600000, 5));
-    QFile settingsFile("U:/BaiduCloud.json");
+    QFile settingsFile("BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
         return;
     auto value = settingsFile.readAll();
@@ -90,6 +90,7 @@ QStringList BaiduCloudWorker::getFileList()
     QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settings["DiffFileList"].toObject()["UrlPattern"].toString(), parameters));
 
     QJsonObject diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
+    qDebug() << diffFileListResult;
     reply->deleteLater();
     QStringList result = diffFileListResult["entries"].toObject().keys();
     while (diffFileListResult["has_more"].toBool()) {
@@ -158,6 +159,7 @@ ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QS
     foreach (auto item, parameters)
         qDebug() << item.first << item.second;
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters));
+    logger->log(QString::fromUtf8(reply->readAll()));
 
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }
@@ -173,7 +175,8 @@ ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localP
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return ResultType::Failure;
-    manager->executeNetworkRequest(HttpVerb::Put, PString::format(settings["UploadFileDirect"].toObject()["UrlPattern"].toString(), parameters), fileToUpload.readAll());
+    auto reply = manager->executeNetworkRequest(HttpVerb::Put, PString::format(settings["UploadFileDirect"].toObject()["UrlPattern"].toString(), parameters), fileToUpload.readAll());
+    logger->log(QString::fromUtf8(reply->readAll()));
 
     ResultType result = ResultType::Success;
     logger->debug(result, "result");
