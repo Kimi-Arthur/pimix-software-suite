@@ -27,6 +27,18 @@ DeclStart_DeserializeFunctions(int) =
     DeclEntry_DeserializeFunction(JsonFormat, int, return PJsonValue::deserialize(data).toInt(); )
 };
 
+DeclStart_SerializeFunctions(bool) =
+{
+    DeclEntry_SerializeFunction(Normal, bool, return value ? "true" : "false"; ),
+    DeclEntry_SerializeFunction(JsonFormat, bool, return PJsonValue::serialize(PJsonValue(value)); )
+};
+
+DeclStart_DeserializeFunctions(bool) =
+{
+    DeclEntry_DeserializeFunction(Normal, bool, return data == "true"; ),
+    DeclEntry_DeserializeFunction(JsonFormat, bool, return PJsonValue::deserialize(data).toBool(); )
+};
+
 DeclStart_SerializeFunctions(QString) =
 {
     DeclEntry_SerializeFunction(Normal, QString, return value;)

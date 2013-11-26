@@ -9,7 +9,7 @@ namespace Pt {
 namespace Network {
 
 
-typedef bool (*PNetworkValidator)(QNetworkReply *);
+typedef std::function<bool(QNetworkReply *)> PNetworkValidator;
 
 namespace Validator {
 
@@ -27,7 +27,8 @@ public:
     static const int DefaultBaseTimeout = 300000;
     static PNetworkRetryPolicy *DefaultRetryPolicy();
     static PNetworkRetryPolicy *NoRetryPolicy(int timeout, PNetworkValidator validator = Validator::NoErrorValidator);
-    static PNetworkRetryPolicy *FixedIntervalRetryPolicy(int timeout, int timesToTry, PNetworkValidator validator = Validator::NoErrorValidator);
+    static PNetworkRetryPolicy *LimitedRetryPolicy(int timeout, int timesToTry, PNetworkValidator validator = Validator::NoErrorValidator);
+    static PNetworkRetryPolicy *UnlimitedRetryPolicy(int timeout, PNetworkValidator validator = Validator::NoErrorValidator);
     PNetworkRetryPolicy(PNetworkValidator validator) : validator(validator) { status = false; }
     PNetworkRetryPolicy(const PNetworkRetryPolicy &other) : validator(other.validator), status(other.status) {}
     // Keep sync with QTimer::start(int msec)

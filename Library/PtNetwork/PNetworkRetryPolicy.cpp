@@ -10,9 +10,14 @@ Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::NoRetryPolic
     return new PNetworkRetryPolicyFixedIntervalRetry(timeout, 1, validator);
 }
 
-Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::FixedIntervalRetryPolicy(int timeout, int timesToTry, Pt::Network::PNetworkValidator validator)
+Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::LimitedRetryPolicy(int timeout, int timesToTry, Pt::Network::PNetworkValidator validator)
 {
     return new PNetworkRetryPolicyFixedIntervalRetry(timeout, timesToTry, validator);
+}
+
+Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::UnlimitedRetryPolicy(int timeout, Pt::Network::PNetworkValidator validator)
+{
+    return new PNetworkRetryPolicyFixedIntervalRetry(timeout, -1, validator);
 }
 
 Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::PNetworkRetryPolicyFixedIntervalRetry(int timeout, int timesToTry, Pt::Network::PNetworkValidator validator)
@@ -27,7 +32,6 @@ void Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::initializeRetry()
 
 Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::clone()
 {
-    qDebug() << "Derived";
     return new PNetworkRetryPolicyFixedIntervalRetry(*this);
 }
 
@@ -43,7 +47,7 @@ void Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::moveNext()
 
 bool Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::needToTry()
 {
-    return timesTried < timesToTry;
+    return timesToTry < 0 || timesTried < timesToTry;
 }
 
 
