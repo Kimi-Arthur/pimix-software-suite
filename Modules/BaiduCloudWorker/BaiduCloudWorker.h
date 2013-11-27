@@ -34,7 +34,7 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject
 public:
     BaiduCloudWorker(PLogger *_logger = new PLogger());
     ResultType downloadFile(QString remotePath, QString localPath);
-    ResultType uploadFile(QString remotePath, QString localPath);
+    ResultType uploadFile(QString remotePath, QString localPath, bool multithread = false);
     ResultType removePath(QString remotePath);
     QStringList getFileList();
 private slots:

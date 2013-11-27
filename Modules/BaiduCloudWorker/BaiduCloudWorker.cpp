@@ -37,7 +37,7 @@ ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
 
 }
 
-ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
+ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath, bool multithread)
 {
     logger->logMethodIn(__PFUNC_ID__);
 
@@ -58,9 +58,16 @@ ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
     }
 
     ResultType result;
-    if (fileSize <= BaseBlockSize)
+    if (fileSize <= BaseBlockSize) {
         result = uploadFileDirect(remotePath, localPath);
-    else result = uploadFileByBlockSinglethread(remotePath, localPath);
+        logger->debug(result, PString::format("Result for {LocalPath} via uploadFileDirect", {{"LocalPath", localPath}}));
+    } else if (multithread) {
+        result = uploadFileByBlockMultithread(remotePath, localPath);
+        logger->debug(result, PString::format("Result for {LocalPath} via uploadFileByBlockMultithread", {{"LocalPath", localPath}}));
+    } else {
+        result = uploadFileByBlockSinglethread(remotePath, localPath);
+        logger->debug(result, PString::format("Result for {LocalPath} via uploadFileByBlockSinglethread", {{"LocalPath", localPath}}));
+    }
 
     logger->logMethodOut(__PFUNC_ID__);
     return result;
