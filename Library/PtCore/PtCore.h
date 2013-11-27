@@ -17,7 +17,6 @@ template <typename T> inline const T &pCeilDiv(const T &a, const T &b) { return 
 
 QString PTCORESHARED_EXPORT dateTimeToString(QDateTime dt, Qt::DateFormat format, QString seperator=" ");
 
-QString formatString(QString pattern, QList<QPair<QString, QString> > parameters);
 }
 }
 

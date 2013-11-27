@@ -12,9 +12,3 @@ QString Pt::Core::dateTimeToString(QDateTime dt, Qt::DateFormat format, QString 
     dt.setUtcOffset(dt.secsTo(tempDt));
     return dt.toString(Qt::ISODate).replace("T", separator);
 }
-
-
-QString Pt::Core::formatString(QString pattern, QList<QPair<QString, QString> > parameters)
-{
-
-}
