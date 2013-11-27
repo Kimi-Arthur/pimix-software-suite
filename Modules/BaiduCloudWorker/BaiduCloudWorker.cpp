@@ -20,7 +20,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     : logger(_logger)
 {
     logger->displayBound = PLogger::LogType::TraceLog;
-    logger->logMethodIn("BaiduCloudWorker", "BaiduCloudWorker");
+    logger->logMethodIn(__PFUNC_ID__);
     manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(600000, 5));
     QFile settingsFile("BaiduCloud.json");
     if (!settingsFile.open(QIODevice::ReadOnly))
@@ -29,7 +29,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
     settings = QJsonDocument::fromJson(value).object();
     qDebug() << settings;
 
-    logger->logMethodOut("BaiduCloudWorker", "BaiduCloudWorker");
+    logger->logMethodOut(__PFUNC_ID__);
 }
 
 ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
@@ -39,13 +39,13 @@ ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
 
 ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
 {
-    logger->logMethodIn("BaiduCloudWorker", "uploadFile");
+    logger->logMethodIn(__PFUNC_ID__);
 
     logger->debug(remotePath, "remotePath");
     QFile f(localPath);
     if (!f.open(QIODevice::ReadOnly)) {
         logger->debug(PString::format("Local file \" {LocalPath}\" open error.", {{"LocalPath", localPath}}));
-        logger->logMethodOut("BaiduCloudWorker", "uploadFile");
+        logger->logMethodOut(__PFUNC_ID__);
         return ResultType::Failure;
     }
     qint64 fileSize = f.size();
@@ -53,19 +53,22 @@ ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath)
     // Try rapid upload first
     if (uploadFileRapid(remotePath, localPath) == ResultType::Success) {
         logger->debug(PString::format("Succeeded with uploadFileRapid, {LocalPath}", {{"LocalPath", localPath}}));
-        logger->logMethodOut("BaiduCloudWorker", "uploadFile");
+        logger->logMethodOut(__PFUNC_ID__);
         return ResultType::Success;
     }
-    if (fileSize <= BaseBlockSize)
-        uploadFileDirect(remotePath, localPath);
-    else uploadFileByBlockSinglethread(remotePath, localPath);
 
-    logger->logMethodOut("BaiduCloudWorker", "uploadFile");
+    ResultType result;
+    if (fileSize <= BaseBlockSize)
+        result = uploadFileDirect(remotePath, localPath);
+    else result = uploadFileByBlockSinglethread(remotePath, localPath);
+
+    logger->logMethodOut(__PFUNC_ID__);
+    return result;
 }
 
 ResultType BaiduCloudWorker::removePath(QString remotePath)
 {
-    logger->logMethodIn("BaiduCloudWorker", "removePath");
+    logger->logMethodIn(__PFUNC_ID__);
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -75,13 +78,13 @@ ResultType BaiduCloudWorker::removePath(QString remotePath)
     manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["RemovePath"].toObject()["UrlPattern"].toString(), parameters));
     ResultType result = ResultType::Success;
 
-    logger->logMethodOut("BaiduCloudWorker", "removePath");
+    logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
 QStringList BaiduCloudWorker::getFileList()
 {
-    logger->logMethodIn("BaiduCloudWorker", "getFileList");
+    logger->logMethodIn(__PFUNC_ID__);
     std::map<QString, QString> parameters = {
         {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()},
         {"Cursor", "null"}
@@ -102,7 +105,7 @@ QStringList BaiduCloudWorker::getFileList()
     }
     result.replaceInStrings(QRegularExpression("^/apps/Pimix/"), "");
     logger->debug(result, "File List");
-    logger->logMethodOut("BaiduCloudWorker", "getFileList");
+    logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
@@ -122,7 +125,7 @@ qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
 
 std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPath)
 {
-    logger->logMethodIn("BaiduCloudWorker", "getFileInfos");
+    logger->logMethodIn(__PFUNC_ID__);
     std::map<QString, QString> result;
     QFile f(localPath);
     if (f.open(QIODevice::ReadOnly)) {
@@ -143,13 +146,13 @@ std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPa
     }
     logger->debug(result["ContentMd5"]);
     logger->debug(result["ContentCrc32"]);
-    logger->logMethodOut("BaiduCloudWorker", "getFileInfos");
+    logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
 ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
 {
-    logger->logMethodIn("BaiduCloudWorker", "uploadFileRapid");
+    logger->logMethodIn(__PFUNC_ID__);
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -162,13 +165,13 @@ ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QS
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
     logger->debug(QString::fromUtf8(reply->readAll()));
 
-    logger->logMethodOut("BaiduCloudWorker", "uploadFileRapid");
+    logger->logMethodOut(__PFUNC_ID__);
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }
 
 ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localPath)
 {
-    logger->logMethodIn("BaiduCloudWorker", "uploadFileDirect");
+    logger->logMethodIn(__PFUNC_ID__);
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
         {"RemotePathPrefix", settings["RemotePathPrefix"].toString()},
@@ -182,12 +185,13 @@ ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localP
 
     ResultType result = ResultType::Success;
     logger->debug(result, "result");
-    logger->logMethodOut("BaiduCloudWorker", "uploadFileDirect");
+    logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
 ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QString localPath)
 {
+    logger->logMethodIn(__PFUNC_ID__);
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return ResultType::Failure;
@@ -239,11 +243,14 @@ ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QS
         blockResultList.append(currentBlockStatus.result());
         qDebug() << blockResultList;
     }
-    return mergeBlocks(remotePath, blockResultList);
+    ResultType result = mergeBlocks(remotePath, blockResultList);
+    logger->logMethodOut(__PFUNC_ID__);
+    return result;
 }
 
 ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
 {
+    logger->logMethodIn(__PFUNC_ID__);
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return ResultType::Failure;
@@ -261,7 +268,9 @@ ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, Q
         logger->debug(ok, "Current status");
         data = fileToUpload.read(BaseBlockSize);
     }
-    return mergeBlocks(remotePath, blockHashList);
+    ResultType result = mergeBlocks(remotePath, blockHashList);
+    logger->logMethodOut(__PFUNC_ID__);
+    return result;
 }
 
 bool BaiduCloudWorker::verifyFile(const QString &remotePath)
@@ -278,7 +287,7 @@ bool BaiduCloudWorker::verifyFile(const QString &remotePath)
 
 QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
 {
-    logger->logMethodIn("BaiduCloudWorker", "uploadBlock");
+    logger->logMethodIn(__PFUNC_ID__);
     logger->debug(data.size(), "UploadBlockSize");
     std::map<QString, QString> parameters = {
         {"AccessToken", settings["Accounts"].toObject()["PimixT"].toObject()["AccessToken"].toString()}
@@ -290,13 +299,13 @@ QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
     reply->deleteLater();
     QJsonObject blockUploadResult = QJsonDocument::fromJson(result).object();
     logger->debug(QString::fromUtf8(result), "Block upload result");
-    logger->logMethodOut("BaiduCloudWorker", "uploadBlock");
+    logger->logMethodOut(__PFUNC_ID__);
     return blockUploadResult["md5"].toString();
 }
 
 ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
 {
-    logger->logMethodIn("BaiduCloudWorker", "mergeBlocks");
+    logger->logMethodIn(__PFUNC_ID__);
 
     std::map<QString, QString> parameters = {
         {"RemotePath", remotePath},
@@ -310,7 +319,7 @@ ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHa
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, request, QByteArray("param=") + QJsonDocument(param).toJson());
 
     logger->debug(QString::fromUtf8(reply->readAll()));
-    logger->logMethodOut("BaiduCloudWorker", "mergeBlocks");
 
+    logger->logMethodOut(__PFUNC_ID__);
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }

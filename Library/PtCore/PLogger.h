@@ -7,6 +7,13 @@
 namespace Pt {
 namespace Core {
 
+#ifdef __FUNCSIG__
+  #define __PFUNC_ID__ __FUNCSIG__
+#else
+  #define __PFUNC_ID__ __PRETTY_FUNCTION__
+#endif
+
+
 class PTCORESHARED_EXPORT PLogger
 {
     static PLogger *staticInstance;
@@ -97,14 +104,14 @@ public:
         log(content, objectName, LogType::FatalLog);
     }
 
-    inline void logMethodIn(const QString &className, const QString &methodName)
+    inline void logMethodIn(const QString &functionId)
     {
-        trace(">>> " + className + "." + methodName);
+        trace(">>> " + functionId);
     }
 
-    inline void logMethodOut(const QString &className, const QString &methodName)
+    inline void logMethodOut(const QString &functionId)
     {
-        trace("<<< " + className + "." + methodName);
+        trace("<<< " + functionId);
     }
 
 private:
