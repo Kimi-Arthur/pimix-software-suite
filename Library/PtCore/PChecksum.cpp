@@ -12,6 +12,7 @@ public:
     virtual void reset() = 0;
     virtual void addData(const QByteArray &data) = 0;
     virtual QByteArray result() const = 0;
+    virtual ~PChecksumMethod() = 0;
 };
 
 class PChecksumMethodCrc32 : public PChecksumMethod
