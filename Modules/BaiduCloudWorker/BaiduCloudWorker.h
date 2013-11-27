@@ -23,6 +23,7 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject
     QString accessToken;
     QMap<QString, QString> requestUrlPatterns;
     const qint64 BaseBlockSize = 32 * PFile::MegabyteSize;
+    const int BlockSizeIncrementalStep = 2;
     const qint64 MaxBlockSize = 2 * PFile::GigabyteSize;
     const qint64 MaxBlockCount = 1024;
     const qint64 MaxThreadCount = 8;

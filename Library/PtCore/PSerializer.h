@@ -41,12 +41,12 @@ public:
 
     static inline QString serialize(const QStringList value, PSerializationType serializationType = PSerializationType::Normal)
     {
-        return PSerializer::serialize(QList<QString>(value));
+        return PSerializer::serialize(QList<QString>(value), serializationType);
     }
 
     static inline QString serialize(const char *value, PSerializationType serializationType = PSerializationType::Normal)
     {
-        return value;
+        return PSerializer::serialize<QString>(value, serializationType);
     }
 };
 

@@ -126,8 +126,13 @@ void BaiduCloudWorker::showProgress(qint64 bs, qint64 bt)
 
 qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
 {
-    if (fileSize > MaxBlockSize * MaxBlockCount)
+    if (fileSize > MaxBlockCount * MaxBlockSize)
         return 0;
+    qint64 blockSize = BaseBlockSize;
+    while (MaxBlockCount * blockSize < fileSize)
+        blockSize <<= BlockSizeIncrementalStep;
+
+    return blockSize;
 }
 
 std::map<QString, QString> BaiduCloudWorker::getFileInfos(const QString &localPath)
