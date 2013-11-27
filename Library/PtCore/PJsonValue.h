@@ -19,7 +19,7 @@ public:
     QJsonDocument toDocument() const;
     static QString serialize(const PJsonValue &value);
     static PJsonValue deserialize(const QString &data);
-    int toInt();
+    int toInt(int defaultValue = 0);
 };
 
 class PTCORESHARED_EXPORT PJsonValueRef : public QJsonValueRef

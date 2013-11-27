@@ -34,7 +34,7 @@ BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
 
 ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
 {
-
+    return ResultType::Failure;
 }
 
 ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath, bool multithread)
@@ -229,7 +229,6 @@ ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QS
 
     QByteArray data = fileToUpload.read(BaseBlockSize);
     qDebug() << QStringList("Start");
-    bool ok = true;
     // QList needn't be thread safe here.
     // All operation to QList is done here in the same thread.
     QList<QFuture<QString>> blockStatusList;
@@ -269,15 +268,11 @@ ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, Q
     QStringList blockHashList;
 
     QByteArray data = fileToUpload.read(BaseBlockSize);
-    qDebug() << "Start";
-    bool ok = true;
     while (!data.isEmpty()) {
         bc = 0;
         blockHashList.append(uploadBlock(data));
-        ok = ok && !blockHashList.back().isEmpty();
         logger->debug(blockHashList, "Finished blocks");
         logger->debug(blockHashList.count(), "Finished blocks count");
-        logger->debug(ok, "Current status");
         data = fileToUpload.read(BaseBlockSize);
     }
     ResultType result = mergeBlocks(remotePath, blockHashList);

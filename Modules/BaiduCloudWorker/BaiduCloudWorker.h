@@ -32,14 +32,17 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject
     // Temp variables
     qint64 bc;
     PLogger *logger;
+
 public:
     BaiduCloudWorker(PLogger *_logger = new PLogger());
     ResultType downloadFile(QString remotePath, QString localPath);
     ResultType uploadFile(QString remotePath, QString localPath, bool multithread = false);
     ResultType removePath(QString remotePath);
     QStringList getFileList();
+
 private slots:
     void showProgress(qint64 bs, qint64 bt);
+
 private:
     qint64 getBlockSize(qint64 fileSize);
     std::map<QString, QString> getFileInfos(const QString &localPath);

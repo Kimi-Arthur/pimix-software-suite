@@ -62,10 +62,11 @@ PJsonValue PJsonValue::deserialize(const QString &data)
     return PJsonValue(o["o"]);
 }
 
-int PJsonValue::toInt()
+int PJsonValue::toInt(int defaultValue)
 {
     if (isDouble())
         return toDouble();
+    return defaultValue;
 }
 
 PJsonValue PJsonValueRef::operator [](QString key) const
