@@ -1,5 +1,5 @@
 #include "PConfig.h"
 
-PConfig::PConfig()
+Pt::Core::PConfig::PConfig()
 {
 }

@@ -10,6 +10,7 @@ class PJsonValueRef;
 class PTCORESHARED_EXPORT PJsonValue : public QJsonValue
 {
 public:
+    PJsonValue(Type type = Null) : QJsonValue(type) {}
     PJsonValue(QJsonValue val) : QJsonValue(val) {}
     PJsonValue operator [](QString key) const;
     PJsonValueRef operator [](QString key);

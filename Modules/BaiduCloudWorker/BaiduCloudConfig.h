@@ -8,18 +8,39 @@
 #include <QList>
 #include "PtNetwork.h"
 
-class BaiduCloudApi
+class BaiduCloudApi : Pt::Core::PDataModel
 {
+public:
+    BaiduCloudApi();
+
+    DataMember()
     QString url;
-    Pt::Network::HttpVerb verb;
+
+    DataMember()
+    Pt::Network::HttpVerb method;
 };
 
-class BaiduCloudConfig : PConfig
+class BaiduCloudConfig : Pt::Core::PDataModel
 {
 public:
     BaiduCloudConfig();
 
-    // Data Model
+    DataMember()
+    QString name;
+
+    DataMember()
+    QString title;
+
+    DataMember(client_secret)
+    QString clientSecret;
+
+    DataMember(client_id)
+    QString clientId;
+
+    DataMember(remote_path_prefix)
+    QString remotePathPrefix;
+
+    DataMember()
     QMap<QString, BaiduCloudApi> apis;
 };
 

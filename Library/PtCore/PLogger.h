@@ -3,6 +3,7 @@
 
 #include "PtCore_global.h"
 #include "PSerializer.h"
+#include "PString.h"
 
 namespace Pt {
 namespace Core {
@@ -59,9 +60,7 @@ public:
         if (objectName != "")
             parameters["content"].prepend(objectName + QSL(" = "));
 
-        QString resultLog = logPattern;
-        foreach (auto parameter, parameters)
-            resultLog.replace("{" + parameter.first + "}", parameter.second);
+        QString resultLog = PString::format(logPattern, parameters);
 
 
         displayLog(resultLog, logType);
