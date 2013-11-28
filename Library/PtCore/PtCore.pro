@@ -24,7 +24,8 @@ SOURCES += PtCore.cpp \
     PSerializer.cpp \
     PChecksum.cpp \
     PString.cpp \
-    PConfig.cpp
+    PConfig.cpp \
+    PDataModel.cpp
 
 HEADERS += PtCore.h\
     PSettings.h \
@@ -36,7 +37,8 @@ HEADERS += PtCore.h\
     PChecksum.h \
     PtCore_global.h \
     PString.h \
-    PConfig.h
+    PConfig.h \
+    PDataModel.h
 
 LIBS += -lz
 

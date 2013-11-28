@@ -3,6 +3,11 @@
 
 #include "PtCore_global.h"
 
+#include "PDataModel.h"
+
+namespace Pt {
+namespace Core {
+
 class PTCORESHARED_EXPORT PConfig
 {
 protected:
@@ -13,4 +18,6 @@ public:
     PConfig();
 };
 
+}
+}
 #endif // PCONFIG_H
