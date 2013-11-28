@@ -32,9 +32,5 @@ else:unix: LIBS += -L$$SRC_DIR/Library/PtCore/ -lPtCore
 INCLUDEPATH += $$SRC_DIR/Library/PtCore
 DEPENDPATH += $$SRC_DIR/Library/PtCore
 
-win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtNetwork/release/ -lPtNetwork
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtNetwork/debug/ -lPtNetwork
-else:unix: LIBS += -L$$SRC_DIR/Library/PtNetwork/ -lPtNetwork
-
 INCLUDEPATH += $$SRC_DIR/Library/PtNetwork
 DEPENDPATH += $$SRC_DIR/Library/PtNetwork
