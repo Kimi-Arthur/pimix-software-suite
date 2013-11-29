@@ -14,8 +14,13 @@ protected:
     QString moduleName;
     QStringList saerchPathList = {".", "~", "/etc"};
     int currentPathIndex = 0;
+    std::map<QString, PJsonValue> data;
 public:
-    PConfig();
+    PDataModel(const PJsonValue &value = PJsonValue()) { setJsonValue(value); }
+    virtual void setJsonValue(const PJsonValue &value);
+    virtual PJsonValue getJsonValue() const;
+    virtual void setValue(const QString &jsonPath, const PJsonValue &value);
+    virtual PJsonValue getValue(const QString &jsonPath) const;
 };
 
 }
