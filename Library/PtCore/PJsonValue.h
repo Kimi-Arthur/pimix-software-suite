@@ -27,6 +27,10 @@ class PTCORESHARED_EXPORT PJsonValueRef : public QJsonValueRef
 {
 public:
     PJsonValueRef(QJsonValueRef ref) : QJsonValueRef(ref) {}
+
+    PJsonValueRef &operator = (const PJsonValue &val);
+    PJsonValueRef &operator = (const PJsonValueRef &val);
+
     PJsonValue operator [](QString key) const;
     PJsonValueRef operator [](QString key);
 
