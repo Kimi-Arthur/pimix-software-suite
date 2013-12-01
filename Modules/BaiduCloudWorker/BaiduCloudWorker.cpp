@@ -172,8 +172,6 @@ ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QS
     };
     std::map<QString, QString> fileInfos = getFileInfos(localPath);
     parameters.insert(fileInfos.begin(), fileInfos.end());
-    foreach (auto item, parameters)
-        qDebug() << item.first << item.second;
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settings["UploadFileRapid"].toObject()["UrlPattern"].toString(), parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
     logger->debug(QString::fromUtf8(reply->readAll()));
 

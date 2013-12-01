@@ -16,7 +16,7 @@ protected:
     int currentPathIndex = 0;
     std::map<QString, PJsonValue> data;
 public:
-    PDataModel(const PJsonValue &value = PJsonValue()) { setJsonValue(value); }
+    PConfig(const PJsonValue &value = PJsonValue()) { setJsonValue(value); }
     virtual void setJsonValue(const PJsonValue &value);
     virtual PJsonValue getJsonValue() const;
     virtual void setValue(const QString &jsonPath, const PJsonValue &value);
