@@ -69,6 +69,16 @@ int PJsonValue::toInt(int defaultValue)
     return defaultValue;
 }
 
+PJsonValueRef &PJsonValueRef::operator =(const PJsonValue &val)
+{
+
+}
+
+PJsonValueRef &PJsonValueRef::operator =(const PJsonValueRef &val)
+{
+
+}
+
 PJsonValue PJsonValueRef::operator [](QString key) const
 {
     return PJsonValue(this->toObject()[key]);
