@@ -20,7 +20,9 @@ public:
     QJsonDocument toDocument() const;
     static QString serialize(const PJsonValue &value);
     static PJsonValue deserialize(const QString &data);
-    int toInt(int defaultValue = 0);
+    std::map<QString, QString> toMap() const;
+private:
+    QString normalizeSlash(QString rawKey) const;
 };
 
 class PTCORESHARED_EXPORT PJsonValueRef : public QJsonValueRef

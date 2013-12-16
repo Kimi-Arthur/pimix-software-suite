@@ -62,11 +62,41 @@ PJsonValue PJsonValue::deserialize(const QString &data)
     return PJsonValue(o["o"]);
 }
 
-int PJsonValue::toInt(int defaultValue)
+std::map<QString, QString> PJsonValue::toMap() const
 {
-    if (isDouble())
-        return toDouble();
-    return defaultValue;
+    std::map<QString, PJsonValue> tempResult;
+    std::map<QString, QString> result;
+    if (type() == Type::Array) {
+        auto arr = this->toArray();
+        for (int i = 0; i < arr.size(); ++i)
+            tempResult['/' + QString::number(i)] = (*this)[i];
+    }
+    if (type() == Type::Object) {
+        auto obj = this->toObject();
+        foreach (auto key, obj.keys())
+            tempResult[normalizeSlash(key)] = (*this)[key];
+    }
+    switch (type()) {
+    case Type::Array:
+    case Type::Object:
+        for (auto item : tempResult) {
+            std::map<QString, QString> subResult = item.second.toMap();
+            for (auto subItem : subResult)
+                if (subItem.first == "")
+                    result[item.first] = subItem.second;
+                else
+                    result[item.first + '/' + subItem.first] = subItem.second;
+        }
+        break;
+    default:
+        result[""] = serialize(*this);
+    }
+    return result;
+}
+
+QString PJsonValue::normalizeSlash(QString rawKey) const
+{
+    return rawKey.replace("/", "\\/");
 }
 
 PJsonValueRef &PJsonValueRef::operator =(const PJsonValue &val)
