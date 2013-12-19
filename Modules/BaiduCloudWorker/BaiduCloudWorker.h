@@ -8,6 +8,7 @@
 #include "PFile.h"
 #include "PtCore.h"
 #include "PtNetwork.h"
+#include "PJsonValue.h"
 #include "PLogger.h"
 #include "PString.h"
 #include <map>
@@ -27,11 +28,13 @@ class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject
     const qint64 MaxBlockSize = 2 * PFile::GigabyteSize;
     const qint64 MaxBlockCount = 1024;
     const qint64 MaxThreadCount = 8;
-    QJsonObject settings;
+    PJsonValue settings;
+    PStringMap settingsMap;
     PNetworkAccessManager *manager = new PNetworkAccessManager();
     // Temp variables
     qint64 bc;
     PLogger *logger;
+    const QString settingsFileName = "baidu_cloud.pc";
 
 public:
     BaiduCloudWorker(PLogger *_logger = new PLogger());
@@ -45,7 +48,7 @@ private slots:
 
 private:
     qint64 getBlockSize(qint64 fileSize);
-    std::map<QString, QString> getFileInfos(const QString &localPath);
+    PStringMap getFileInfos(const QString &localPath);
     ResultType uploadFileRapid(const QString &remotePath, const QString &localPath);
     ResultType uploadFileDirect(QString remotePath, QString localPath);
     ResultType uploadFileByBlockMultithread(QString remotePath, QString localPath);

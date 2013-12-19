@@ -51,7 +51,7 @@ public:
     template<class T>
     void log(const T &content, const QString &objectName = "", LogType logType = LogType::TraceLog) const
     {
-        std::map<QString, QString> parameters = {
+        PStringMap parameters = {
             {"content", PSerializer::serialize(content)},
             {"type", LogTypeStrings[logType]},
             {"datetime", QDateTime::currentDateTime().toString(Qt::ISODate)}

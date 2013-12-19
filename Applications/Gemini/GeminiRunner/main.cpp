@@ -45,15 +45,13 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    PJsonValue v(QJsonDocument::fromJson("{\"abc\": {\"t\" : \"bcd\"}, \"ts\\n/et\": [1,3,787]}").object());
-    qDebug() << QMap<QString, QString>(v.toMap());
-//    QString basePath = argv[1];
-//    qDebug() << basePath;
-//    while (true) {
-//        auto fl = getUpdatedFileList(basePath);
-//        foreach (auto f, fl) {
-//            uploadFile(basePath, f);
-//        }
-//        QThread::sleep(1800);
-//    }
+    QString basePath = argv[1];
+    qDebug() << basePath;
+    while (true) {
+        auto fl = getUpdatedFileList(basePath);
+        foreach (auto f, fl) {
+            uploadFile(basePath, f);
+        }
+        QThread::sleep(1800);
+    }
 }
