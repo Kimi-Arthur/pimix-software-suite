@@ -2,9 +2,12 @@
 #define PJSONVALUE_H
 
 #include "PtCore_global.h"
+#include "PString.h"
 #include <QJsonDocument>
 #include <QJsonValue>
 
+namespace Pt {
+namespace Core {
 class PJsonValueRef;
 
 class PTCORESHARED_EXPORT PJsonValue : public QJsonValue
@@ -20,7 +23,7 @@ public:
     QJsonDocument toDocument() const;
     static QString serialize(const PJsonValue &value);
     static PJsonValue deserialize(const QString &data);
-    std::map<QString, QString> toMap() const;
+    PStringMap toMap() const;
 private:
     QString normalizeSlash(QString rawKey) const;
 };
@@ -40,5 +43,8 @@ public:
     PJsonValueRef operator [](int index);
 };
 
+
+}
+}
 
 #endif // PJSONVALUE_H

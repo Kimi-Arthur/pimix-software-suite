@@ -3,6 +3,9 @@
 #include "PJsonValue.h"
 #include "PSerializer.h"
 
+namespace Pt {
+namespace Core {
+
 DeclStart_SerializeFunctions(PJsonValue) =
 {
     DeclEntry_SerializeFunction(Normal, PJsonValue, return PJsonValue::serialize(value); )
@@ -62,10 +65,10 @@ PJsonValue PJsonValue::deserialize(const QString &data)
     return PJsonValue(o["o"]);
 }
 
-std::map<QString, QString> PJsonValue::toMap() const
+PStringMap PJsonValue::toMap() const
 {
     std::map<QString, PJsonValue> tempResult;
-    std::map<QString, QString> result;
+    PStringMap result;
     if (type() == Type::Array) {
         auto arr = this->toArray();
         for (int i = 0; i < arr.size(); ++i)
@@ -80,13 +83,16 @@ std::map<QString, QString> PJsonValue::toMap() const
     case Type::Array:
     case Type::Object:
         for (auto item : tempResult) {
-            std::map<QString, QString> subResult = item.second.toMap();
+            PStringMap subResult = item.second.toMap();
             for (auto subItem : subResult)
                 if (subItem.first == "")
                     result[item.first] = subItem.second;
                 else
                     result[item.first + '/' + subItem.first] = subItem.second;
         }
+        break;
+    case Type::String:
+        result[""] = toString();
         break;
     default:
         result[""] = serialize(*this);
@@ -127,4 +133,7 @@ PJsonValue PJsonValueRef::operator [](int index) const
 PJsonValueRef PJsonValueRef::operator [](int index)
 {
     return PJsonValueRef(this->toArray()[index]);
+}
+
+}
 }
