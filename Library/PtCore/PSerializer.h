@@ -34,9 +34,20 @@ public:
     {
         QStringList items;
         foreach (auto &v, value) {
-            items.append(PSerializer::serialize(v, serializationType));
+            items.append(serialize(v, serializationType));
         }
         return "[" + items.join(", ") + "]";
+    }
+
+    template<class K, class V>
+    static inline QString serialize(const QMap<K, V> &value, PSerializationType serializationType = PSerializationType::Normal)
+    {
+        QStringList items;
+        for (auto it = value.constBegin(); it != value.constEnd(); ++it) {
+            items.append(serialize(it.key(), serializationType) + ":" + serialize(it.value(), serializationType));
+        }
+
+        return "{" + items.join(", ") + "}";
     }
 
     static inline QString serialize(const QStringList value, PSerializationType serializationType = PSerializationType::Normal)

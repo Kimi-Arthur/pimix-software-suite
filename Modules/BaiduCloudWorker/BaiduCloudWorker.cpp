@@ -83,7 +83,7 @@ ResultType BaiduCloudWorker::removePath(QString remotePath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters {
-        {"remote_path", remotePath},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", settingsMap["accounts/PimixT/access_token"]}
     };
 
@@ -119,7 +119,7 @@ QStringList BaiduCloudWorker::getFileList()
         reply->deleteLater();
         result.append(diffFileListResult["entries"].toObject().keys());
     }
-    result.replaceInStrings(QRegularExpression("^" + settingsMap["remote_path_prefix"]), "");
+    result.replaceInStrings(QRegularExpression("^" + settingsMap["remote_path_prefix"] + "/"), "");
     logger->debug(result, "File List");
     logger->logMethodOut(__PFUNC_ID__);
     return result;
@@ -165,8 +165,7 @@ PStringMap BaiduCloudWorker::getFileInfos(const QString &localPath)
         result["content_md5"] = md5.result().toHex();
         result["content_crc32"] = crc.result().toHex();
     }
-    logger->debug(result["ContentMd5"]);
-    logger->debug(result["ContentCrc32"]);
+    logger->debug(result, "File infos");
     logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
@@ -175,7 +174,7 @@ ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QS
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters = {
-        {"remote_path", remotePath},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", settingsMap["accounts/PimixT/access_token"]}
     };
 
@@ -194,7 +193,7 @@ ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localP
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters = {
-        {"remote_path", remotePath},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", settingsMap["accounts/PimixT/access_token"]}
     };
 
@@ -294,7 +293,7 @@ ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, Q
 bool BaiduCloudWorker::verifyFile(const QString &remotePath)
 {
     PStringMap parameters = {
-        {"remote_path", remotePath},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", settingsMap["accounts/PimixT/access_token"]}
     };
 
@@ -330,7 +329,7 @@ ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHa
     logger->logMethodIn(__PFUNC_ID__);
 
     PStringMap parameters = {
-        {"remote_path", remotePath},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", settingsMap["accounts/PimixT/access_token"]}
     };
 
