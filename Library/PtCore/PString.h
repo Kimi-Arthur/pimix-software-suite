@@ -32,6 +32,8 @@ public:
     {
         return QMap<QString, QString>(*this);
     }
+
+    static QString serialize(const PStringMap &value);
 };
 
 }
