@@ -18,30 +18,54 @@ using namespace Pt::Core;
 
 using namespace Pt::Network;
 
-class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudWorker : public QObject
+class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudAccountInfo
 {
-    // Variables
+public:
+    explicit BaiduCloudAccountInfo(const PJsonValue &value)
+    {
+        qDebug() << value;
+        auto m = value.toMap();
+        username = m["username"];
+        accessToken = m["access_token"];
+    }
+
+    QString username;
     QString accessToken;
+};
+
+class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudAccount : public QObject
+{
+
+public:
+    static BaiduCloudAccount *getInstanceByPath(const QString &remotePath);
+    static BaiduCloudAccount *getInstanceByName(const QString &accountName);
+
+    explicit BaiduCloudAccount(const QString &accountName);
+    ResultType downloadFile(QString remotePath, QString localPath);
+    ResultType uploadFile(QString remotePath, QString localPath, bool multithread = false);
+    ResultType removePath(QString remotePath);
+    QStringList getFileList();
+
+private:
+    static void initialize();
+    static PLogger *logger;
+    static PJsonValue *settings;
+    static PStringMap *settingsMap;
+    static QMap<QString, BaiduCloudAccount *> existingAccounts;
+
+private:
+    // Variables
+    BaiduCloudAccountInfo accountInfo;
     QMap<QString, QString> requestUrlPatterns;
     const qint64 BaseBlockSize = 32 * PFile::MegabyteSize;
     const int BlockSizeIncrementalStep = 2;
     const qint64 MaxBlockSize = 2 * PFile::GigabyteSize;
     const qint64 MaxBlockCount = 1024;
     const qint64 MaxThreadCount = 8;
-    PJsonValue settings;
-    PStringMap settingsMap;
     PNetworkAccessManager *manager = new PNetworkAccessManager();
     // Temp variables
     qint64 bc;
-    PLogger *logger;
-    const QString settingsFileName = "baidu_cloud.pc";
-
-public:
-    BaiduCloudWorker(PLogger *_logger = new PLogger());
-    ResultType downloadFile(QString remotePath, QString localPath);
-    ResultType uploadFile(QString remotePath, QString localPath, bool multithread = false);
-    ResultType removePath(QString remotePath);
-    QStringList getFileList();
+    const static QString settingsFileName;
 
 private slots:
     void showProgress(qint64 bs, qint64 bt);

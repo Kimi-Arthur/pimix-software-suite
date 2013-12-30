@@ -16,10 +16,10 @@ public:
     PJsonValue(Type type = Null) : QJsonValue(type) {}
     PJsonValue(QJsonValue val) : QJsonValue(val) {}
     PJsonValue operator [](QString key) const;
-    PJsonValueRef operator [](QString key);
+    PJsonValue operator [](QString key);
 
     PJsonValue operator [](int index) const;
-    PJsonValueRef operator [](int index);
+    PJsonValue operator [](int index);
     QJsonDocument toDocument() const;
     static QString serialize(const PJsonValue &value);
     static PJsonValue deserialize(const QString &data);
@@ -32,6 +32,8 @@ class PTCORESHARED_EXPORT PJsonValueRef : public QJsonValueRef
 {
 public:
     PJsonValueRef(QJsonValueRef ref) : QJsonValueRef(ref) {}
+
+    inline operator PJsonValue() const { return QJsonValue(*this); }
 
     PJsonValueRef &operator = (const PJsonValue &val);
     PJsonValueRef &operator = (const PJsonValueRef &val);

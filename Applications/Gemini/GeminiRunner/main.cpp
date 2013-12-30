@@ -4,9 +4,9 @@
 #include <QStringList>
 #include <QThread>
 
-#include "BaiduCloudWorker.h"
+#include "BaiduCloudAccount.h"
 
-BaiduCloudWorker w;
+BaiduCloudAccount *w = BaiduCloudAccount::getInstanceByName("PimixT");
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
@@ -21,7 +21,7 @@ QStringList getLocalFileList(const QString &baseLocalPath)
 
 QStringList getUpdatedFileList(const QString &baseLocalPath)
 {
-    QStringList onlineList = w.getFileList();
+    QStringList onlineList = w->getFileList();
     QStringList offlineList = getLocalFileList(baseLocalPath);
 
     onlineList.replaceInStrings(QRegularExpression("^Arch/"), "");
@@ -38,7 +38,7 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
 
 void uploadFile(const QString &baseLocalPath, const QString &relativePath)
 {
-    w.uploadFile("Arch/" + relativePath, baseLocalPath + "/" + relativePath);
+    w->uploadFile("Arch/" + relativePath, baseLocalPath + "/" + relativePath);
 }
 
 int main(int argc, char *argv[])

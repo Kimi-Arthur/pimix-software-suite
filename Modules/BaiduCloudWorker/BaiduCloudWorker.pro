@@ -13,12 +13,12 @@ TEMPLATE = lib
 
 DEFINES += BAIDUCLOUDWORKER_LIBRARY
 
-SOURCES += BaiduCloudWorker.cpp \
-    BaiduCloudConfig.cpp
+SOURCES += \
+    BaiduCloudAccount.cpp
 
-HEADERS += BaiduCloudWorker.h\
+HEADERS +=\
         baiducloudworker_global.h \
-    BaiduCloudConfig.h
+    BaiduCloudAccount.h
 
 DLLDESTDIR = $$BIN_DIR
 
