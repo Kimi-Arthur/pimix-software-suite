@@ -1,4 +1,4 @@
-#include "BaiduCloudWorker.h"
+#include "BaiduCloudAccount.h"
 #include <QEventLoop>
 #include <QFile>
 #include <QNetworkAccessManager>
@@ -16,34 +16,53 @@
 #include "PLogger.h"
 
 using namespace Pt::Core;
-BaiduCloudWorker::BaiduCloudWorker(PLogger *_logger)
-    : logger(_logger)
+
+const QString BaiduCloudAccount::settingsFileName = "baidu_cloud.pc";
+
+PLogger *BaiduCloudAccount::logger = nullptr;
+PJsonValue *BaiduCloudAccount::settings = nullptr;
+PStringMap *BaiduCloudAccount::settingsMap = nullptr;
+QMap<QString, BaiduCloudAccount *> BaiduCloudAccount::existingAccounts = QMap<QString, BaiduCloudAccount *>();
+
+BaiduCloudAccount::BaiduCloudAccount(const QString &accountName)
+    : accountInfo((*settings)["accounts"][accountName])
 {
-    logger->displayBound = PLogger::LogType::TraceLog;
     logger->logMethodIn(__PFUNC_ID__);
+
     manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(600000, 5));
-    QFile settingsFile(settingsFileName);
-    if (!settingsFile.open(QIODevice::ReadOnly)) {
-        logger->debug(PString::format("Settings file {SettingsFile} not found!", {{"SettingsFile", settingsFileName}}));
-        logger->logMethodOut(__PFUNC_ID__);
-        return;
-    }
-    auto value = settingsFile.readAll();
-    settings = PJsonValue(QJsonDocument::fromJson(value).object());
-    settingsMap = settings.toMap();
-    qDebug() << settings;
-    for (auto kv : settings.toMap())
-        qDebug() << kv.first << kv.second;
+
+    logger->debug(accountInfo.username, "username");
+    logger->debug(accountInfo.accessToken, "access token");
 
     logger->logMethodOut(__PFUNC_ID__);
 }
 
-ResultType BaiduCloudWorker::downloadFile(QString remotePath, QString localPath)
+void BaiduCloudAccount::initialize()
+{
+    if (logger == nullptr) {
+        logger = new PLogger();
+        logger->displayBound = PLogger::LogType::TraceLog;
+    }
+    qDebug() << "Step 2";
+
+    if (settings == nullptr) {
+        QFile settingsFile(settingsFileName);
+        if (!settingsFile.open(QIODevice::ReadOnly)) {
+            logger->debug(PString::format("Settings file {SettingsFile} not found!", {{"SettingsFile", settingsFileName}}));
+            return;
+        }
+        auto value = settingsFile.readAll();
+        settings = new PJsonValue(QJsonDocument::fromJson(value).object());
+        settingsMap = new PStringMap(settings->toMap());
+    }
+}
+
+ResultType BaiduCloudAccount::downloadFile(QString remotePath, QString localPath)
 {
     return ResultType::Failure;
 }
 
-ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath, bool multithread)
+ResultType BaiduCloudAccount::uploadFile(QString remotePath, QString localPath, bool multithread)
 {
     logger->logMethodIn(__PFUNC_ID__);
 
@@ -79,34 +98,34 @@ ResultType BaiduCloudWorker::uploadFile(QString remotePath, QString localPath, b
     return result;
 }
 
-ResultType BaiduCloudWorker::removePath(QString remotePath)
+ResultType BaiduCloudAccount::removePath(QString remotePath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
-        {"access_token", settingsMap["accounts/PimixT/access_token"]}
+        {"access_token", accountInfo.accessToken}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
-    manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap["apis/remove_path/url"], parameters));
+    manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap->at("apis/remove_path/url"), parameters));
     ResultType result = ResultType::Success;
 
     logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
-QStringList BaiduCloudWorker::getFileList()
+QStringList BaiduCloudAccount::getFileList()
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters {
-        {"access_token", settingsMap["accounts/PimixT/access_token"]},
+        {"access_token", accountInfo.accessToken},
         {"cursor", "null"}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
-    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap["apis/diff_file_list/url"], parameters));
+    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap->at("apis/diff_file_list/url"), parameters));
 
     QJsonObject diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
     qDebug() << diffFileListResult;
@@ -114,18 +133,18 @@ QStringList BaiduCloudWorker::getFileList()
     QStringList result = diffFileListResult["entries"].toObject().keys();
     while (diffFileListResult["has_more"].toBool()) {
         parameters["cursor"] = diffFileListResult["cursor"].toString();
-        reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap["apis/diff_file_list/url"], parameters));
+        reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap->at("apis/diff_file_list/url"), parameters));
         diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
         reply->deleteLater();
         result.append(diffFileListResult["entries"].toObject().keys());
     }
-    result.replaceInStrings(QRegularExpression("^" + settingsMap["remote_path_prefix"] + "/"), "");
+    result.replaceInStrings(QRegularExpression("^" + settingsMap->at("remote_path_prefix") + "/"), "");
     logger->debug(result, "File List");
     logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
-void BaiduCloudWorker::showProgress(qint64 bs, qint64 bt)
+void BaiduCloudAccount::showProgress(qint64 bs, qint64 bt)
 {
     if (bs - bc > 500 * PFile::KilobyteSize) {
         qDebug() << "Progress" << bs << bt;
@@ -133,7 +152,7 @@ void BaiduCloudWorker::showProgress(qint64 bs, qint64 bt)
     }
 }
 
-qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
+qint64 BaiduCloudAccount::getBlockSize(qint64 fileSize)
 {
     if (fileSize > MaxBlockCount * MaxBlockSize)
         return 0;
@@ -144,7 +163,7 @@ qint64 BaiduCloudWorker::getBlockSize(qint64 fileSize)
     return blockSize;
 }
 
-PStringMap BaiduCloudWorker::getFileInfos(const QString &localPath)
+PStringMap BaiduCloudAccount::getFileInfos(const QString &localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap result;
@@ -170,39 +189,39 @@ PStringMap BaiduCloudWorker::getFileInfos(const QString &localPath)
     return result;
 }
 
-ResultType BaiduCloudWorker::uploadFileRapid(const QString &remotePath, const QString &localPath)
+ResultType BaiduCloudAccount::uploadFileRapid(const QString &remotePath, const QString &localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters = {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
-        {"access_token", settingsMap["accounts/PimixT/access_token"]}
+        {"access_token", accountInfo.accessToken}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
     PStringMap fileInfos = getFileInfos(localPath);
     parameters.insert(fileInfos.begin(), fileInfos.end());
-    auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap["apis/upload_file_rapid/url"], parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
+    auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap->at("apis/upload_file_rapid/url"), parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
     logger->debug(QString::fromUtf8(reply->readAll()));
 
     logger->logMethodOut(__PFUNC_ID__);
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }
 
-ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localPath)
+ResultType BaiduCloudAccount::uploadFileDirect(QString remotePath, QString localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     PStringMap parameters = {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
-        {"access_token", settingsMap["accounts/PimixT/access_token"]}
+        {"access_token", accountInfo.accessToken}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return ResultType::Failure;
-    auto reply = manager->executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap["apis/upload_file_direct/url"], parameters), fileToUpload.readAll());
+    auto reply = manager->executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap->at("apis/upload_file_direct/url"), parameters), fileToUpload.readAll());
     logger->log(QString::fromUtf8(reply->readAll()));
 
     ResultType result = ResultType::Success;
@@ -211,7 +230,7 @@ ResultType BaiduCloudWorker::uploadFileDirect(QString remotePath, QString localP
     return result;
 }
 
-ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QString localPath)
+ResultType BaiduCloudAccount::uploadFileByBlockMultithread(QString remotePath, QString localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     QFile fileToUpload(localPath);
@@ -245,7 +264,7 @@ ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QS
     QList<QString> blockResultList;
     while (!data.isEmpty()) {
         bc = 0;
-        blockStatusList.append(QtConcurrent::run(this, &BaiduCloudWorker::uploadBlock, data));
+        blockStatusList.append(QtConcurrent::run(this, &BaiduCloudAccount::uploadBlock, data));
         while (blockStatusList.size() > MaxThreadCount) {
             QFuture<QString> currentBlockStatus = blockStatusList.takeFirst();
             currentBlockStatus.waitForFinished();
@@ -269,7 +288,7 @@ ResultType BaiduCloudWorker::uploadFileByBlockMultithread(QString remotePath, QS
     return result;
 }
 
-ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
+ResultType BaiduCloudAccount::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
     QFile fileToUpload(localPath);
@@ -290,32 +309,32 @@ ResultType BaiduCloudWorker::uploadFileByBlockSinglethread(QString remotePath, Q
     return result;
 }
 
-bool BaiduCloudWorker::verifyFile(const QString &remotePath)
+bool BaiduCloudAccount::verifyFile(const QString &remotePath)
 {
     PStringMap parameters = {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
-        {"access_token", settingsMap["accounts/PimixT/access_token"]}
+        {"access_token", accountInfo.accessToken}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
-    manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap["apis/verify_file/url"], parameters));
+    manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap->at("apis/verify_file/url"), parameters));
     return false;
 }
 
-QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
+QString BaiduCloudAccount::uploadBlock(const QByteArray &data)
 {
     logger->logMethodIn(__PFUNC_ID__);
     logger->debug(data.size(), "UploadBlockSize");
     PStringMap parameters = {
-        {"access_token", settingsMap["accounts/PimixT/access_token"]}
+        {"access_token", accountInfo.accessToken}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
     PNetworkAccessManager m;
     m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1200000));
-    QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap["apis/upload_block/url"], parameters), data);
+    QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap->at("apis/upload_block/url"), parameters), data);
     auto result = reply->readAll();
     reply->deleteLater();
     QJsonObject blockUploadResult = QJsonDocument::fromJson(result).object();
@@ -324,20 +343,20 @@ QString BaiduCloudWorker::uploadBlock(const QByteArray &data)
     return blockUploadResult["md5"].toString();
 }
 
-ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHashList)
+ResultType BaiduCloudAccount::mergeBlocks(QString remotePath, QStringList blockHashList)
 {
     logger->logMethodIn(__PFUNC_ID__);
 
     PStringMap parameters = {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
-        {"access_token", settingsMap["accounts/PimixT/access_token"]}
+        {"access_token", accountInfo.accessToken}
     };
 
-    parameters.insert(settingsMap.begin(), settingsMap.end());
+    parameters.insert(settingsMap->begin(), settingsMap->end());
 
     QJsonObject param;
     param["block_list"] = QJsonArray::fromStringList(blockHashList);
-    QNetworkRequest request(PString::format(settingsMap["apis/merge_blocks/url"], parameters));
+    QNetworkRequest request(PString::format(settingsMap->at("apis/merge_blocks/url"), parameters));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, request, QByteArray("param=") + QJsonDocument(param).toJson());
 
@@ -345,4 +364,22 @@ ResultType BaiduCloudWorker::mergeBlocks(QString remotePath, QStringList blockHa
 
     logger->logMethodOut(__PFUNC_ID__);
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
+}
+
+
+BaiduCloudAccount *BaiduCloudAccount::getInstanceByPath(const QString &remotePath)
+{
+    initialize();
+}
+
+BaiduCloudAccount *BaiduCloudAccount::getInstanceByName(const QString &accountName)
+{
+    initialize();
+    auto item = existingAccounts.find(accountName);
+    if (item == existingAccounts.end()) {
+        logger->debug("No item for " + accountName + " exists!");
+        existingAccounts[accountName] = new BaiduCloudAccount(accountName);
+        item = existingAccounts.find(accountName);
+    }
+    return item.value();
 }

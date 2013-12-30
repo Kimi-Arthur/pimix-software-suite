@@ -21,9 +21,9 @@ PJsonValue PJsonValue::operator [](QString key) const
     return PJsonValue(this->toObject()[key]);
 }
 
-PJsonValueRef PJsonValue::operator [](QString key)
+PJsonValue PJsonValue::operator [](QString key)
 {
-    return PJsonValueRef(this->toObject()[key]);
+    return PJsonValue(this->toObject()[key]);
 }
 
 PJsonValue PJsonValue::operator [](int index) const
@@ -31,9 +31,9 @@ PJsonValue PJsonValue::operator [](int index) const
     return PJsonValue(this->toArray()[index]);
 }
 
-PJsonValueRef PJsonValue::operator [](int index)
+PJsonValue PJsonValue::operator [](int index)
 {
-    return PJsonValueRef(this->toArray()[index]);
+    return PJsonValue(this->toArray()[index]);
 }
 
 QJsonDocument PJsonValue::toDocument() const
