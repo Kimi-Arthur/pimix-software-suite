@@ -1,9 +1,6 @@
 #ifndef PTCORE_GLOBAL_H
 #define PTCORE_GLOBAL_H
 
-#if defined __cplusplus
-
-
 #include <QtCore/qglobal.h>
 
 #include <QByteArray>
@@ -15,8 +12,6 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <map>
-
-#endif
 
 #define QSL QStringLiteral
 

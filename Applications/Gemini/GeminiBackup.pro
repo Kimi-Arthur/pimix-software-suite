@@ -3,14 +3,14 @@ TEMPLATE = subdirs
 PtCore.subdir = $$SRC_DIR/Library/PtCore
 PtNetwork.subdir = $$SRC_DIR/Library/PtNetwork
 
-BaiduCloudWorker.subdir = $$SRC_DIR/Modules/BaiduCloudWorker
-BaiduCloudWorker.depends = PtCore PtNetwork
+BaiduCloud.subdir = $$SRC_DIR/Modules/BaiduCloud
+BaiduCloud.depends = PtCore PtNetwork
 
-GeminiRunner.depends = BaiduCloudWorker
+GeminiRunner.depends = BaiduCloud
 
 SUBDIRS += \
     PtCore \
     PtNetwork \
-    BaiduCloudWorker \
+    BaiduCloud \
     GeminiRunner
 
