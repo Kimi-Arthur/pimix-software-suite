@@ -17,15 +17,11 @@
 
 using namespace Pt::Core;
 
-const QString BaiduCloudAccount::settingsFileName = "baidu_cloud.pc";
-
-PLogger *BaiduCloudAccount::logger = nullptr;
-PJsonValue *BaiduCloudAccount::settings = nullptr;
-PStringMap *BaiduCloudAccount::settingsMap = nullptr;
-QMap<QString, BaiduCloudAccount *> BaiduCloudAccount::existingAccounts = QMap<QString, BaiduCloudAccount *>();
-
-BaiduCloudAccount::BaiduCloudAccount(const QString &accountName)
-    : accountInfo((*settings)["accounts"][accountName])
+BaiduCloudAccount::BaiduCloudAccount(const BaiduCloudAccountInfo &accountInfo, PJsonValue *settings, PStringMap *settingsMap, PLogger *logger)
+    : accountInfo(accountInfo),
+      settings(settings),
+      settingsMap(settingsMap),
+      logger(logger)
 {
     logger->logMethodIn(__PFUNC_ID__);
 
@@ -35,26 +31,6 @@ BaiduCloudAccount::BaiduCloudAccount(const QString &accountName)
     logger->debug(accountInfo.accessToken, "access token");
 
     logger->logMethodOut(__PFUNC_ID__);
-}
-
-void BaiduCloudAccount::initialize()
-{
-    if (logger == nullptr) {
-        logger = new PLogger();
-        logger->displayBound = PLogger::LogType::TraceLog;
-    }
-    qDebug() << "Step 2";
-
-    if (settings == nullptr) {
-        QFile settingsFile(settingsFileName);
-        if (!settingsFile.open(QIODevice::ReadOnly)) {
-            logger->debug(PString::format("Settings file {SettingsFile} not found!", {{"SettingsFile", settingsFileName}}));
-            return;
-        }
-        auto value = settingsFile.readAll();
-        settings = new PJsonValue(QJsonDocument::fromJson(value).object());
-        settingsMap = new PStringMap(settings->toMap());
-    }
 }
 
 ResultType BaiduCloudAccount::downloadFile(QString remotePath, QString localPath)
@@ -201,6 +177,13 @@ ResultType BaiduCloudAccount::uploadFileRapid(const QString &remotePath, const Q
 
     PStringMap fileInfos = getFileInfos(localPath);
     parameters.insert(fileInfos.begin(), fileInfos.end());
+
+    if (fileInfos["content_length"].toLongLong() < MinRapidUploadSize) {
+        logger->debug("Rapid upload fail because file size is too small.");
+        logger->logMethodOut(__PFUNC_ID__);
+        return ResultType::Failure;
+    }
+
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap->at("apis/upload_file_rapid/url"), parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
     logger->debug(QString::fromUtf8(reply->readAll()));
 
@@ -366,20 +349,3 @@ ResultType BaiduCloudAccount::mergeBlocks(QString remotePath, QStringList blockH
     return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 }
 
-
-BaiduCloudAccount *BaiduCloudAccount::getInstanceByPath(const QString &remotePath)
-{
-    initialize();
-}
-
-BaiduCloudAccount *BaiduCloudAccount::getInstanceByName(const QString &accountName)
-{
-    initialize();
-    auto item = existingAccounts.find(accountName);
-    if (item == existingAccounts.end()) {
-        logger->debug("No item for " + accountName + " exists!");
-        existingAccounts[accountName] = new BaiduCloudAccount(accountName);
-        item = existingAccounts.find(accountName);
-    }
-    return item.value();
-}

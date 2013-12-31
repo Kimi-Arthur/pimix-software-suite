@@ -7,6 +7,15 @@
 #include <QJsonObject>
 #include <QMap>
 
+#include "PFile.h"
+#include "PtCore.h"
+#include "PtNetwork.h"
+#include "PJsonValue.h"
+#include "PLogger.h"
+#include "PString.h"
+#include <map>
+#include "PNetworkAccessManager.h"
+
 
 #if defined(BAIDUCLOUD_LIBRARY)
 #  define BAIDUCLOUDSHARED_EXPORT Q_DECL_EXPORT
