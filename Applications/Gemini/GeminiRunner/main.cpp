@@ -4,9 +4,11 @@
 #include <QStringList>
 #include <QThread>
 
+#include "BaiduCloudService.h"
 #include "BaiduCloudAccount.h"
 
-BaiduCloudAccount *w = BaiduCloudAccount::getInstanceByName("PimixT");
+BaiduCloudService s("baidu_cloud.pc");
+BaiduCloudAccount *w = s.getAccountByName("Pimix_0");
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {

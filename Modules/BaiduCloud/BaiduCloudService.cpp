@@ -1,5 +1,48 @@
 #include "BaiduCloudService.h"
 
-BaiduCloudService::BaiduCloudService(const QString &settingsFile)
+#include <QEventLoop>
+#include <QFile>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QtMath>
+#include <QJsonArray>
+#include <QPair>
+#include <QTimer>
+#include <QStringList>
+#include <QtConcurrent/QtConcurrent>
+#include "PLogger.h"
+#include "PChecksum.h"
+#include <tuple>
+#include "PLogger.h"
+
+BaiduCloudService::BaiduCloudService(const QString &settingsFileName)
 {
+    logger.displayBound = PLogger::LogType::TraceLog;
+
+    QFile settingsFile(settingsFileName);
+    if (!settingsFile.open(QIODevice::ReadOnly)) {
+        logger.debug(PString::format("Settings file {SettingsFile} not found!", {{"SettingsFile", settingsFileName}}));
+        return;
+    }
+    auto value = settingsFile.readAll();
+    settings = PJsonValue(QJsonDocument::fromJson(value).object());
+    settingsMap = settings.toMap();
+}
+
+
+BaiduCloudAccount *BaiduCloudService::getAccountByPath(const QString &remotePath)
+{
+}
+
+BaiduCloudAccount *BaiduCloudService::getAccountByName(const QString &accountName)
+{
+    auto item = existingAccounts.find(accountName);
+    if (item == existingAccounts.end()) {
+        logger.debug("No item for " + accountName + " exists!");
+        item = existingAccounts.insert(accountName,
+                                       new BaiduCloudAccount(BaiduCloudAccountInfo(settings["accounts"][accountName]),
+                                       &settings, &settingsMap, &logger));
+    }
+    return item.value();
 }
