@@ -1,10 +1,7 @@
-#ifndef BAIDUCLOUDWORKER_H
-#define BAIDUCLOUDWORKER_H
+#ifndef BAIDUCLOUDACCOUNT_H
+#define BAIDUCLOUDACCOUNT_H
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QMap>
-#include "baiducloudworker_global.h"
+#include "BaiduCloud_global.h"
 #include "PFile.h"
 #include "PtCore.h"
 #include "PtNetwork.h"
@@ -18,7 +15,7 @@ using namespace Pt::Core;
 
 using namespace Pt::Network;
 
-class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudAccountInfo
+class BAIDUCLOUDSHARED_EXPORT BaiduCloudAccountInfo
 {
 public:
     explicit BaiduCloudAccountInfo(const PJsonValue &value)
@@ -33,7 +30,7 @@ public:
     QString accessToken;
 };
 
-class BAIDUCLOUDWORKERSHARED_EXPORT BaiduCloudAccount : public QObject
+class BAIDUCLOUDSHARED_EXPORT BaiduCloudAccount : public QObject
 {
 
 public:
@@ -83,4 +80,4 @@ private:
 };
 
 
-#endif // BAIDUCLOUDWORKER_H
+#endif // BAIDUCLOUDACCOUNT_H

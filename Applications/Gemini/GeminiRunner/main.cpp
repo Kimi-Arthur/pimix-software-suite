@@ -10,7 +10,6 @@ BaiduCloudAccount *w = BaiduCloudAccount::getInstanceByName("PimixT");
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
-    qDebug() << "Base Local Path" << baseLocalPath;
     QDir d(baseLocalPath);
     QStringList result = d.entryList(QDir::Files).replaceInStrings(QRegularExpression("^"), baseLocalPath + "/");
     foreach (auto de, d.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {

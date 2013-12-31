@@ -1,29 +1,39 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-11-08T11:47:32
+# Project created by QtCreator 2013-09-05T20:01:50
 #
 #-------------------------------------------------
 
-QT       += core network
+QT       += network concurrent
 
 QT       -= gui
 
-TARGET = GeminiRunner
-CONFIG   += console
-CONFIG   -= app_bundle
+TARGET = BaiduCloud
+TEMPLATE = lib
 
-TEMPLATE = app
+DEFINES += BAIDUCLOUD_LIBRARY
 
-DESTDIR = $$BIN_DIR
+SOURCES += \
+    BaiduCloudAccount.cpp \
+    BaiduCloudService.cpp
 
-SOURCES += main.cpp
 
-win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Modules/BaiduCloud/release/ -lBaiduCloud
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Modules/BaiduCloud/debug/ -lBaiduCloud
-else:unix: LIBS += -L$$SRC_DIR/Modules/BaiduCloud/ -lBaiduCloud
+PRECOMPILED_HEADER = BaiduCloud_global.h
 
-INCLUDEPATH += $$SRC_DIR/Modules/BaiduCloud
-DEPENDPATH += $$SRC_DIR/Modules/BaiduCloud
+HEADERS +=\
+    BaiduCloudAccount.h \
+    BaiduCloudService.h
+
+DLLDESTDIR = $$BIN_DIR
+
+unix:!symbian {
+    maemo5 {
+        target.path = /opt/usr/lib
+    } else {
+        target.path = $$LIB_DIR
+    }
+    INSTALLS += target
+}
 
 win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtCore/release/ -lPtCore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtCore/debug/ -lPtCore
