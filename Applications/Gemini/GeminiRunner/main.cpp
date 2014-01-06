@@ -8,7 +8,7 @@
 #include "BaiduCloudAccount.h"
 
 BaiduCloudService s("baidu_cloud.pc");
-BaiduCloudAccount *w = s.getAccountByName("Pimix_0");
+BaiduCloudAccount *w = s.getAccountByPath("Games/good");
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
@@ -25,7 +25,6 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
     QStringList onlineList = w->getFileList();
     QStringList offlineList = getLocalFileList(baseLocalPath);
 
-    onlineList.replaceInStrings(QRegularExpression("^Arch/"), "");
     offlineList.replaceInStrings(QRegularExpression("^" + baseLocalPath + "/"), "");
 
     qDebug() << offlineList;
@@ -39,7 +38,7 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
 
 void uploadFile(const QString &baseLocalPath, const QString &relativePath)
 {
-    w->uploadFile("Arch/" + relativePath, baseLocalPath + "/" + relativePath);
+    w->uploadFile(relativePath, baseLocalPath + "/" + relativePath);
 }
 
 int main(int argc, char *argv[])

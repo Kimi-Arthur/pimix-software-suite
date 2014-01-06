@@ -33,10 +33,31 @@ BaiduCloudService::BaiduCloudService(const QString &settingsFileName)
 
 BaiduCloudAccount *BaiduCloudService::getAccountByPath(const QString &remotePath)
 {
+    logger.logMethodIn(__PFUNC_ID__);
+    int maxCapturedLength = -1;
+    QString accountName;
+    foreach (auto mapping, settings["mappings"].toArray()) {
+        auto value = PJsonValue(mapping).toMap();
+        int len = QRegularExpression(value["path"]).match(remotePath).capturedLength();
+        if (len > maxCapturedLength)
+        {
+            maxCapturedLength = len;
+            accountName = value["account"];
+        }
+    }
+
+    logger.debug(accountName, "Selected account");
+    logger.debug(maxCapturedLength, "Captured length");
+    auto result = getAccountByName(accountName);
+
+    logger.logMethodOut(__PFUNC_ID__);
+    return result;
 }
 
 BaiduCloudAccount *BaiduCloudService::getAccountByName(const QString &accountName)
 {
+    logger.logMethodIn(__PFUNC_ID__);
+
     auto item = existingAccounts.find(accountName);
     if (item == existingAccounts.end()) {
         logger.debug("No item for " + accountName + " exists!");
@@ -44,5 +65,7 @@ BaiduCloudAccount *BaiduCloudService::getAccountByName(const QString &accountNam
                                        new BaiduCloudAccount(BaiduCloudAccountInfo(settings["accounts"][accountName]),
                                        &settings, &settingsMap, &logger));
     }
+
+    logger.logMethodOut(__PFUNC_ID__);
     return item.value();
 }
