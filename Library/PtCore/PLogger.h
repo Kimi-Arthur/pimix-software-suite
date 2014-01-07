@@ -51,10 +51,11 @@ public:
     template<class T>
     void log(const T &content, const QString &objectName = "", LogType logType = LogType::TraceLog) const
     {
+        QDateTime cdt = QDateTime::currentDateTime();
         PStringMap parameters = {
             {"content", PSerializer::serialize(content)},
             {"type", LogTypeStrings[logType]},
-            {"datetime", QDateTime::currentDateTime().toString(Qt::ISODate)}
+            {"datetime", cdt.toOffsetFromUtc(cdt.offsetFromUtc()).toString(Qt::ISODate)}
         };
 
         if (objectName != "")
@@ -111,6 +112,16 @@ public:
     inline void logMethodOut(const QString &functionId)
     {
         trace("<<< " + functionId);
+    }
+
+    template<class T>
+    inline void logAssertEquals(const T &expected, const T &actual, const QString &objectName = "") const
+    {
+        QString content = PSerializer::serialize(actual) + " (" + PSerializer::serialize(expected) + ")";
+        if (expected == actual)
+            debug(content, objectName);
+        else
+            warn(content, objectName);
     }
 
 private:

@@ -49,6 +49,9 @@ private:
     const qint64 MaxBlockCount = 1024;
     const qint64 MaxThreadCount = 8;
     PNetworkAccessManager *manager = new PNetworkAccessManager();
+
+    QStringList currentFileList;
+    QString currentFileListCursor = "null";
     // Temp variables
     qint64 bc;
 
@@ -57,11 +60,13 @@ private slots:
 
 private:
     qint64 getBlockSize(qint64 fileSize);
+    bool diffFileList();
     PStringMap getFileInfos(const QString &localPath);
     ResultType uploadFileRapid(const QString &remotePath, const QString &localPath);
     ResultType uploadFileDirect(QString remotePath, QString localPath);
     ResultType uploadFileByBlockMultithread(QString remotePath, QString localPath);
     ResultType uploadFileByBlockSinglethread(QString remotePath, QString localPath);
+    bool pathExists(const QString &remotePath);
     bool verifyFile(const QString &remotePath);
     QString uploadBlock(const QByteArray &data);
     ResultType mergeBlocks(QString remotePath, QStringList blockHashList);

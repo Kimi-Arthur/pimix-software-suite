@@ -9,6 +9,7 @@
 
 BaiduCloudService s("baidu_cloud.pc");
 BaiduCloudAccount *w = s.getAccountByPath("Games/good");
+PLogger logger;
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
@@ -22,23 +23,18 @@ QStringList getLocalFileList(const QString &baseLocalPath)
 
 QStringList getUpdatedFileList(const QString &baseLocalPath)
 {
-    QStringList onlineList = w->getFileList();
     QStringList offlineList = getLocalFileList(baseLocalPath);
 
     offlineList.replaceInStrings(QRegularExpression("^" + baseLocalPath + "/"), "");
 
     qDebug() << offlineList;
 
-    foreach (auto online, onlineList) {
-        offlineList.removeAll(online);
-    }
-
     return offlineList;
 }
 
 void uploadFile(const QString &baseLocalPath, const QString &relativePath)
 {
-    w->uploadFile(relativePath, baseLocalPath + "/" + relativePath);
+    s.getAccountByPath(relativePath)->uploadFile(relativePath, baseLocalPath + "/" + relativePath);
 }
 
 int main(int argc, char *argv[])
@@ -48,10 +44,12 @@ int main(int argc, char *argv[])
     QString basePath = argv[1];
     qDebug() << basePath;
     while (true) {
+        logger.info("One round of sync started!");
         auto fl = getUpdatedFileList(basePath);
         foreach (auto f, fl) {
             uploadFile(basePath, f);
         }
+        logger.info("One round of sync done! Sleep 30 mins.");
         QThread::sleep(1800);
     }
 }
