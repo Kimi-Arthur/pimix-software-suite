@@ -28,7 +28,6 @@ BaiduCloudAccount::BaiduCloudAccount(const BaiduCloudAccountInfo &accountInfo, P
     manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(600000, 5));
 
     logger->debug(accountInfo.username, "username");
-    logger->debug(accountInfo.accessToken, "access token");
 
     logger->logMethodOut(__PFUNC_ID__);
 }
@@ -43,9 +42,17 @@ ResultType BaiduCloudAccount::uploadFile(QString remotePath, QString localPath, 
     logger->logMethodIn(__PFUNC_ID__);
 
     logger->debug(remotePath, "remote_path");
+
+    if (pathExists(remotePath))
+    {
+        logger->debug(PString::format("Remote path \"{remote_path}\" already exists!", {{"remote_path", remotePath}}));
+        logger->logMethodOut(__PFUNC_ID__);
+        return ResultType::Failure;
+    }
+
     QFile f(localPath);
     if (!f.open(QIODevice::ReadOnly)) {
-        logger->debug(PString::format("Local file \" {LocalPath}\" open error.", {{"LocalPath", localPath}}));
+        logger->debug(PString::format("Local file \"{local_path}\" open error!", {{"local_path", localPath}}));
         logger->logMethodOut(__PFUNC_ID__);
         return ResultType::Failure;
     }
@@ -94,30 +101,13 @@ ResultType BaiduCloudAccount::removePath(QString remotePath)
 QStringList BaiduCloudAccount::getFileList()
 {
     logger->logMethodIn(__PFUNC_ID__);
-    PStringMap parameters {
-        {"access_token", accountInfo.accessToken},
-        {"cursor", "null"}
-    };
 
-    parameters.insert(settingsMap->begin(), settingsMap->end());
+    while (diffFileList());
 
-    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap->at("apis/diff_file_list/url"), parameters));
+    logger->debug(currentFileList.size(), "Current file list size");
 
-    QJsonObject diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
-    qDebug() << diffFileListResult;
-    reply->deleteLater();
-    QStringList result = diffFileListResult["entries"].toObject().keys();
-    while (diffFileListResult["has_more"].toBool()) {
-        parameters["cursor"] = diffFileListResult["cursor"].toString();
-        reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap->at("apis/diff_file_list/url"), parameters));
-        diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
-        reply->deleteLater();
-        result.append(diffFileListResult["entries"].toObject().keys());
-    }
-    result.replaceInStrings(QRegularExpression("^" + settingsMap->at("remote_path_prefix") + "/"), "");
-    logger->debug(result, "File List");
     logger->logMethodOut(__PFUNC_ID__);
-    return result;
+    return currentFileList;
 }
 
 void BaiduCloudAccount::showProgress(qint64 bs, qint64 bt)
@@ -137,6 +127,44 @@ qint64 BaiduCloudAccount::getBlockSize(qint64 fileSize)
         blockSize <<= BlockSizeIncrementalStep;
 
     return blockSize;
+}
+
+bool BaiduCloudAccount::diffFileList()
+{
+    logger->logMethodIn(__PFUNC_ID__);
+    PStringMap parameters {
+        {"access_token", accountInfo.accessToken},
+        {"cursor", currentFileListCursor}
+    };
+
+    parameters.insert(settingsMap->begin(), settingsMap->end());
+
+    QNetworkReply *reply = manager->executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap->at("apis/diff_file_list/url"), parameters));
+
+    QJsonObject diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
+    reply->deleteLater();
+
+    currentFileListCursor = diffFileListResult["cursor"].toString();
+
+    if (diffFileListResult["reset"].toBool())
+        currentFileList.clear();
+
+    foreach (auto v, diffFileListResult["entries"].toObject()) {
+        QJsonObject properties = v.toObject();
+        if (properties["isdir"].toInt() == 1)
+            continue;
+
+        QString path = v.toObject()["path"].toString().remove(QRegularExpression("^" + settingsMap->at("remote_path_prefix") + "/"));
+        if (properties["isdelete"] == 0)
+            currentFileList.append(path);
+        else {
+            int removedCount = currentFileList.removeAll(path);
+            logger->logAssertEquals(1, removedCount, "File item removed");
+        }
+    }
+
+    logger->logMethodOut(__PFUNC_ID__);
+    return diffFileListResult["has_more"].toBool();
 }
 
 PStringMap BaiduCloudAccount::getFileInfos(const QString &localPath)
@@ -187,8 +215,12 @@ ResultType BaiduCloudAccount::uploadFileRapid(const QString &remotePath, const Q
     auto reply = manager->executeNetworkRequest(HttpVerb::Post, PString::format(settingsMap->at("apis/upload_file_rapid/url"), parameters), QByteArray(), PNetworkRetryPolicy::NoRetryPolicy(600000));
     logger->debug(QString::fromUtf8(reply->readAll()));
 
+    auto result = (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
+
+    reply->deleteLater();
+
     logger->logMethodOut(__PFUNC_ID__);
-    return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
+    return result;
 }
 
 ResultType BaiduCloudAccount::uploadFileDirect(QString remotePath, QString localPath)
@@ -209,6 +241,8 @@ ResultType BaiduCloudAccount::uploadFileDirect(QString remotePath, QString local
 
     ResultType result = ResultType::Success;
     logger->debug(result, "result");
+    reply->deleteLater();
+
     logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
@@ -274,6 +308,7 @@ ResultType BaiduCloudAccount::uploadFileByBlockMultithread(QString remotePath, Q
 ResultType BaiduCloudAccount::uploadFileByBlockSinglethread(QString remotePath, QString localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
+
     QFile fileToUpload(localPath);
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return ResultType::Failure;
@@ -288,8 +323,19 @@ ResultType BaiduCloudAccount::uploadFileByBlockSinglethread(QString remotePath, 
         data = fileToUpload.read(BaseBlockSize);
     }
     ResultType result = mergeBlocks(remotePath, blockHashList);
+
     logger->logMethodOut(__PFUNC_ID__);
     return result;
+}
+
+bool BaiduCloudAccount::pathExists(const QString &remotePath)
+{
+    logger->logMethodIn(__PFUNC_ID__);
+
+    QStringList fileList = getFileList();
+
+    logger->logMethodOut(__PFUNC_ID__);
+    return fileList.contains(remotePath);
 }
 
 bool BaiduCloudAccount::verifyFile(const QString &remotePath)
@@ -345,7 +391,9 @@ ResultType BaiduCloudAccount::mergeBlocks(QString remotePath, QStringList blockH
 
     logger->debug(QString::fromUtf8(reply->readAll()));
 
-    logger->logMethodOut(__PFUNC_ID__);
-    return (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
-}
+    auto result = (reply->error() == QNetworkReply::NoError) ? ResultType::Success : ResultType::Failure;
 
+    reply->deleteLater();
+    logger->logMethodOut(__PFUNC_ID__);
+    return result;
+}
