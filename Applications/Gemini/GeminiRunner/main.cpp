@@ -12,11 +12,15 @@ PLogger logger;
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
+    logger.logMethodIn(__PFUNC_ID__);
+
     QDir d(baseLocalPath);
     QStringList result = d.entryList(QDir::Files).replaceInStrings(QRegularExpression("^"), baseLocalPath + "/");
     foreach (auto de, d.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         result.append(getLocalFileList(baseLocalPath + "/" + de));
     }
+
+    logger.logMethodOut(__PFUNC_ID__);
     return result;
 }
 
@@ -30,7 +34,7 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
 
     qDebug() << offlineList;
 
-    logger.logMethodIn(__PFUNC_ID__);
+    logger.logMethodOut(__PFUNC_ID__);
     return offlineList;
 }
 
