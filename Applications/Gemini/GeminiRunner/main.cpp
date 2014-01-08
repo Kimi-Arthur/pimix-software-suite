@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         foreach (auto f, fl) {
             uploadFile(basePath, f);
         }
-        logger.info("One round of sync done! Sleep 30 mins.");
+        logger.info("One round of sync done!\n Sleep 30 mins.");
         QThread::sleep(1800);
     }
 }
