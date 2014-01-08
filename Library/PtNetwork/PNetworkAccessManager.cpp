@@ -52,6 +52,7 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(Pt::Net
         loop.exec();
         if (retryPolicy->validate(reply))
             break;
+        qDebug() << QString("Failed %1 times").arg(i);
     }
     return reply;
 }
