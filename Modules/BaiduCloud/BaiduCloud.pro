@@ -15,14 +15,16 @@ DEFINES += BAIDUCLOUD_LIBRARY
 
 SOURCES += \
     BaiduCloudAccount.cpp \
-    BaiduCloudService.cpp
+    BaiduCloudService.cpp \
+    BaiduCloudUploadException.cpp
 
 
 PRECOMPILED_HEADER = BaiduCloud_global.h
 
 HEADERS +=\
     BaiduCloudAccount.h \
-    BaiduCloudService.h
+    BaiduCloudService.h \
+    BaiduCloudUploadException.h
 
 DLLDESTDIR = $$BIN_DIR
 

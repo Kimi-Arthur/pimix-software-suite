@@ -2,6 +2,7 @@
 #define BAIDUCLOUDACCOUNT_H
 
 #include "BaiduCloud_global.h"
+#include "BaiduCloudUploadException.h"
 
 using namespace Pt::Core;
 
@@ -12,7 +13,6 @@ class BAIDUCLOUDSHARED_EXPORT BaiduCloudAccountInfo
 public:
     explicit BaiduCloudAccountInfo(const PJsonValue &value)
     {
-        qDebug() << value;
         auto m = value.toMap();
         username = m["username"];
         accessToken = m["access_token"];
