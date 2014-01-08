@@ -22,12 +22,15 @@ QStringList getLocalFileList(const QString &baseLocalPath)
 
 QStringList getUpdatedFileList(const QString &baseLocalPath)
 {
+    logger.logMethodIn(__PFUNC_ID__);
+
     QStringList offlineList = getLocalFileList(baseLocalPath);
 
     offlineList.replaceInStrings(QRegularExpression("^" + baseLocalPath + "/"), "");
 
     qDebug() << offlineList;
 
+    logger.logMethodIn(__PFUNC_ID__);
     return offlineList;
 }
 
