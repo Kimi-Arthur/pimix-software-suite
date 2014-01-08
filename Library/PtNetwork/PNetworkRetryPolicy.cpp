@@ -1,27 +1,28 @@
 #include "PNetworkRetryPolicy.h"
+#include <QThread>
 
 Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::DefaultRetryPolicy()
 {
-    return new PNetworkRetryPolicyFixedIntervalRetry(DefaultBaseTimeout, 1, Validator::NoErrorValidator);
+    return new PNetworkRetryPolicyFixedIntervalRetry(1, DefaultBaseTimeout, 0, Validator::NoErrorValidator);
 }
 
-Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::NoRetryPolicy(int timeout, PNetworkValidator validator)
+Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::NoRetryPolicy(int timeout, int wait, PNetworkValidator validator)
 {
-    return new PNetworkRetryPolicyFixedIntervalRetry(timeout, 1, validator);
+    return new PNetworkRetryPolicyFixedIntervalRetry(1, timeout, wait, validator);
 }
 
-Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::LimitedRetryPolicy(int timeout, int timesToTry, Pt::Network::PNetworkValidator validator)
+Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::LimitedRetryPolicy(int timesToTry, int timeout, int wait, Pt::Network::PNetworkValidator validator)
 {
-    return new PNetworkRetryPolicyFixedIntervalRetry(timeout, timesToTry, validator);
+    return new PNetworkRetryPolicyFixedIntervalRetry(timesToTry, timeout, wait, validator);
 }
 
-Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::UnlimitedRetryPolicy(int timeout, Pt::Network::PNetworkValidator validator)
+Pt::Network::PNetworkRetryPolicy *Pt::Network::PNetworkRetryPolicy::UnlimitedRetryPolicy(int timeout, int wait, Pt::Network::PNetworkValidator validator)
 {
-    return new PNetworkRetryPolicyFixedIntervalRetry(timeout, -1, validator);
+    return new PNetworkRetryPolicyFixedIntervalRetry(-1, timeout, wait, validator);
 }
 
-Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::PNetworkRetryPolicyFixedIntervalRetry(int timeout, int timesToTry, Pt::Network::PNetworkValidator validator)
-    : PNetworkRetryPolicy(validator), baseTimeout(timeout), timesToTry(timesToTry)
+Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::PNetworkRetryPolicyFixedIntervalRetry(int timesToTry, int timeout, int waitTime, Pt::Network::PNetworkValidator validator)
+    : PNetworkRetryPolicy(validator), baseTimeout(timeout), timesToTry(timesToTry), waitTime(waitTime)
 {
 }
 
@@ -43,6 +44,7 @@ int Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::timeout()
 void Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::moveNext()
 {
     timesTried++;
+    QThread::msleep(waitTime);
 }
 
 bool Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::needToTry()
@@ -52,6 +54,6 @@ bool Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::needToTry()
 
 
 Pt::Network::PNetworkRetryPolicyFixedIntervalRetry::PNetworkRetryPolicyFixedIntervalRetry(const Pt::Network::PNetworkRetryPolicyFixedIntervalRetry &other)
-    : PNetworkRetryPolicy(other), baseTimeout(other.baseTimeout), timesToTry(other.timesToTry), timesTried(other.timesTried)
+    : PNetworkRetryPolicy(other), baseTimeout(other.baseTimeout), timesToTry(other.timesToTry), timesTried(other.timesTried), waitTime(other.waitTime)
 {
 }

@@ -25,7 +25,7 @@ BaiduCloudAccount::BaiduCloudAccount(const BaiduCloudAccountInfo &accountInfo, P
 {
     logger->logMethodIn(__PFUNC_ID__);
 
-    manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(600000, 5));
+    manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(5, 600000));
 
     logger->debug(accountInfo.username, "username");
 
@@ -365,7 +365,7 @@ QString BaiduCloudAccount::uploadBlock(const QByteArray &data)
     parameters.insert(settingsMap->begin(), settingsMap->end());
 
     PNetworkAccessManager m;
-    m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1200000));
+    m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1800000, 600000));
     QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap->at("apis/upload_block/url"), parameters), data);
     auto result = reply->readAll();
     reply->deleteLater();
