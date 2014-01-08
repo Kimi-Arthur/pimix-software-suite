@@ -8,7 +8,6 @@
 #include "BaiduCloudAccount.h"
 
 BaiduCloudService s("baidu_cloud.pc");
-BaiduCloudAccount *w = s.getAccountByPath("Games/good");
 PLogger logger;
 
 QStringList getLocalFileList(const QString &baseLocalPath)
