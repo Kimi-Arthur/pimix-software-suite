@@ -7,13 +7,15 @@
 #include <QJsonObject>
 #include <QMap>
 
+#include <exception>
+#include <map>
+
 #include "PFile.h"
 #include "PtCore.h"
 #include "PtNetwork.h"
 #include "PJsonValue.h"
 #include "PLogger.h"
 #include "PString.h"
-#include <map>
 #include "PNetworkAccessManager.h"
 
 

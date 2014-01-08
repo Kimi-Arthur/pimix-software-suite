@@ -144,6 +144,9 @@ bool BaiduCloudAccount::diffFileList()
     QJsonObject diffFileListResult = QJsonDocument::fromJson(reply->readAll()).object();
     reply->deleteLater();
 
+    if (reply->error() != QNetworkReply::NoError)
+        throw BaiduCloudUploadException();
+
     currentFileListCursor = diffFileListResult["cursor"].toString();
 
     if (diffFileListResult["reset"].toBool())
@@ -237,7 +240,7 @@ ResultType BaiduCloudAccount::uploadFileDirect(QString remotePath, QString local
     if (!fileToUpload.open(QIODevice::ReadOnly))
         return ResultType::Failure;
     auto reply = manager->executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap->at("apis/upload_file_direct/url"), parameters), fileToUpload.readAll());
-    logger->log(QString::fromUtf8(reply->readAll()));
+    logger->debug(QString::fromUtf8(reply->readAll()));
 
     ResultType result = ResultType::Success;
     logger->debug(result, "result");

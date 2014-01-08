@@ -59,7 +59,11 @@ int main(int argc, char *argv[])
         logger.info("One round of sync started!");
         auto fl = getUpdatedFileList(basePath);
         foreach (auto f, fl) {
-            uploadFile(basePath, f);
+            try {
+                uploadFile(basePath, f);
+            } catch (...) {
+                logger.error("Upload for " + basePath + " failed!");
+            }
         }
         logger.info("One round of sync done!");
         logger.info("Sleep 30 mins.");
