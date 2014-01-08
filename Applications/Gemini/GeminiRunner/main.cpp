@@ -40,7 +40,11 @@ QStringList getUpdatedFileList(const QString &baseLocalPath)
 
 void uploadFile(const QString &baseLocalPath, const QString &relativePath)
 {
+    logger.logMethodIn(__PFUNC_ID__);
+
     s.getAccountByPath(relativePath)->uploadFile(relativePath, baseLocalPath + "/" + relativePath);
+
+    logger.logMethodOut(__PFUNC_ID__);
 }
 
 int main(int argc, char *argv[])
