@@ -41,7 +41,9 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QString basePath = argv[1];
-    qDebug() << basePath;
+
+    logger.info(basePath, "Base local path");
+
     while (true) {
         logger.info("One round of sync started!");
         auto fl = getUpdatedFileList(basePath);
