@@ -21,7 +21,8 @@ Pt::Core::PLogger::PLogger()
     logFileNamePattern.insert(LogType::DebugLog, {DefaultLogFileNamePattern + "-debug.log"});
     logFileNamePattern.insert(LogType::DebugLog, {DefaultLogFileNamePattern + "-full.log"});
     logFileNamePattern.insert(LogType::DebugLog, {DefaultLogFileNamePattern + "-full.log"});
-    displayBound = DefaultDisplayBound;
+    //displayBound = DefaultDisplayBound;
+    displayBound = LogType::TraceLog;
 }
 
 void Pt::Core::PLogger::displayLog(QString resultLog, LogType logType) const
@@ -32,6 +33,14 @@ void Pt::Core::PLogger::displayLog(QString resultLog, LogType logType) const
 
 void Pt::Core::PLogger::writeLog(QString resultLog, LogType logType) const
 {
+    QFile f("a.log");
+    if (f.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream stream(&f);
+        stream.setCodec("UTF-8");
+        stream << resultLog << endl;
+        f.close();
+    }
+
     foreach (auto fileName, logFileNamePattern.value(logType)) {
         QFile file(fileName);
         if (file.open(QIODevice::Append | QIODevice::Text)) {

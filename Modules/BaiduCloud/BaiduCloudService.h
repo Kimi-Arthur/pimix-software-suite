@@ -8,13 +8,13 @@
 class BAIDUCLOUDSHARED_EXPORT BaiduCloudService
 {
 public:
-    explicit BaiduCloudService(const QString &settingsFileName);
+    explicit BaiduCloudService(const QString &settingsFileName, PLogger *logger);
 
     BaiduCloudAccount *getAccountByPath(const QString &remotePath);
     BaiduCloudAccount *getAccountByName(const QString &accountName);
 
 private:
-    PLogger logger;
+    PLogger *logger;
     PJsonValue settings;
     PStringMap settingsMap;
     QMap<QString, BaiduCloudAccount *> existingAccounts;

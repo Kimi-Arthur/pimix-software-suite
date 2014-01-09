@@ -13,16 +13,13 @@
 #include <QtConcurrent/QtConcurrent>
 #include "PLogger.h"
 #include "PChecksum.h"
-#include <tuple>
-#include "PLogger.h"
 
-BaiduCloudService::BaiduCloudService(const QString &settingsFileName)
+BaiduCloudService::BaiduCloudService(const QString &settingsFileName, PLogger *logger)
+    : logger(logger)
 {
-    logger.displayBound = PLogger::LogType::TraceLog;
-
     QFile settingsFile(settingsFileName);
     if (!settingsFile.open(QIODevice::ReadOnly)) {
-        logger.debug(PString::format("Settings file {SettingsFile} not found!", {{"SettingsFile", settingsFileName}}));
+        logger->debug(PString::format("Settings file {SettingsFile} not found!", {{"SettingsFile", settingsFileName}}));
         return;
     }
     auto value = settingsFile.readAll();
@@ -33,7 +30,7 @@ BaiduCloudService::BaiduCloudService(const QString &settingsFileName)
 
 BaiduCloudAccount *BaiduCloudService::getAccountByPath(const QString &remotePath)
 {
-    logger.logMethodIn(__PFUNC_ID__);
+    logger->logMethodIn(__PFUNC_ID__);
     int maxCapturedLength = -1;
     QString accountName;
     foreach (auto mapping, settings["mappings"].toArray()) {
@@ -46,26 +43,26 @@ BaiduCloudAccount *BaiduCloudService::getAccountByPath(const QString &remotePath
         }
     }
 
-    logger.debug(accountName, "Selected account");
-    logger.debug(maxCapturedLength, "Captured length");
+    logger->debug(accountName, "Selected account");
+    logger->debug(maxCapturedLength, "Captured length");
     auto result = getAccountByName(accountName);
 
-    logger.logMethodOut(__PFUNC_ID__);
+    logger->logMethodOut(__PFUNC_ID__);
     return result;
 }
 
 BaiduCloudAccount *BaiduCloudService::getAccountByName(const QString &accountName)
 {
-    logger.logMethodIn(__PFUNC_ID__);
+    logger->logMethodIn(__PFUNC_ID__);
 
     auto item = existingAccounts.find(accountName);
     if (item == existingAccounts.end()) {
-        logger.debug("No item for " + accountName + " exists!");
+        logger->debug("No item for " + accountName + " exists!");
         item = existingAccounts.insert(accountName,
                                        new BaiduCloudAccount(BaiduCloudAccountInfo(settings["accounts"][accountName]),
-                                       &settings, &settingsMap, &logger));
+                                       &settings, &settingsMap, logger));
     }
 
-    logger.logMethodOut(__PFUNC_ID__);
+    logger->logMethodOut(__PFUNC_ID__);
     return item.value();
 }

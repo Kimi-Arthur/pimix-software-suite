@@ -126,7 +126,7 @@ public:
 
 private:
     const QMap<LogType, QString> LogTypeStrings = {{LogType::TraceLog, "TRACE"}, {LogType::DebugLog, "DEBUG"},
-                                                   {LogType::InformationLog, "INFO"}, {LogType::WarningLog, "WARN"},
+                                                   {LogType::InformationLog, "INFO "}, {LogType::WarningLog, "WARN "},
                                                    {LogType::ErrorLog, "ERROR"}, {LogType::FatalLog, "FATAL"}};
     const QString ListSeparator = ", ";
     template<class T>

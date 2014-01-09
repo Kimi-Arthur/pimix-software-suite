@@ -7,8 +7,9 @@
 #include "BaiduCloudService.h"
 #include "BaiduCloudAccount.h"
 
-BaiduCloudService s("baidu_cloud.pc");
 PLogger logger;
+
+BaiduCloudService s("baidu_cloud.pc", &logger);
 
 QStringList getLocalFileList(const QString &baseLocalPath)
 {
