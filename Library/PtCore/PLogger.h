@@ -18,6 +18,7 @@ namespace Core {
 class PTCORESHARED_EXPORT PLogger
 {
     static PLogger *staticInstance;
+
 public:
     static PLogger *globalInstance();
     // Public Types
@@ -34,7 +35,7 @@ public:
     QString logPattern; // What the logs contain.
     LogType displayBound; // Which logs will be displayed.
     QMap<LogType, QSet<QString>> logFileNamePattern; // What the log files' names are.
-    QMap<QString, QString> generalParamters; // Customized fill-in parameters.
+    PStringPairList paramters; // Customized fill-in parameters.
 
     // Public Constructors
     PLogger();
@@ -52,7 +53,7 @@ public:
     void log(const T &content, const QString &objectName = "", LogType logType = LogType::TraceLog) const
     {
         QDateTime cdt = QDateTime::currentDateTime();
-        PStringMap parameters = {
+        PStringMap parameters {
             {"content", PSerializer::serialize(content)},
             {"type", LogTypeStrings[logType]},
             {"datetime", cdt.toOffsetFromUtc(cdt.offsetFromUtc()).toString(Qt::ISODate)}

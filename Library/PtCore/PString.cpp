@@ -10,7 +10,7 @@ PString::PString()
 {
 }
 
-QString PString::format(QString pattern, PStringMap parameters)
+QString PString::format(QString pattern, const PStringPairList &parameters)
 {
     for (auto parameter : parameters)
         pattern.replace(QString("{%1}").arg(parameter.first), parameter.second);
