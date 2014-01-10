@@ -199,7 +199,7 @@ PStringMap BaiduCloudAccount::getFileInfos(const QString &localPath)
 ResultType BaiduCloudAccount::uploadFileRapid(const QString &remotePath, const QString &localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
-    PStringMap parameters = {
+    PStringMap parameters {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", accountInfo.accessToken}
     };
@@ -229,7 +229,7 @@ ResultType BaiduCloudAccount::uploadFileRapid(const QString &remotePath, const Q
 ResultType BaiduCloudAccount::uploadFileDirect(QString remotePath, QString localPath)
 {
     logger->logMethodIn(__PFUNC_ID__);
-    PStringMap parameters = {
+    PStringMap parameters {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", accountInfo.accessToken}
     };
@@ -343,7 +343,7 @@ bool BaiduCloudAccount::pathExists(const QString &remotePath)
 
 bool BaiduCloudAccount::verifyFile(const QString &remotePath)
 {
-    PStringMap parameters = {
+    PStringMap parameters {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", accountInfo.accessToken}
     };
@@ -358,7 +358,7 @@ QString BaiduCloudAccount::uploadBlock(const QByteArray &data)
 {
     logger->logMethodIn(__PFUNC_ID__);
     logger->debug(data.size(), "UploadBlockSize");
-    PStringMap parameters = {
+    PStringMap parameters {
         {"access_token", accountInfo.accessToken}
     };
 
@@ -379,7 +379,7 @@ ResultType BaiduCloudAccount::mergeBlocks(QString remotePath, QStringList blockH
 {
     logger->logMethodIn(__PFUNC_ID__);
 
-    PStringMap parameters = {
+    PStringMap parameters {
         {"remote_path", QUrl::toPercentEncoding(remotePath)},
         {"access_token", accountInfo.accessToken}
     };
