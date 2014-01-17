@@ -1,7 +1,6 @@
 #include "PLogger.h"
 #include <QTextStream>
 #include <QFile>
-#include <QDebug>
 #include <QStringList>
 
 Pt::Core::PLogger *Pt::Core::PLogger::staticInstance = nullptr;
@@ -34,19 +33,16 @@ void Pt::Core::PLogger::displayLog(QString resultLog, LogType logType) const
 
 void Pt::Core::PLogger::writeLog(QString resultLog, LogType logType) const
 {
-    QFile f("a.log");
-    if (f.open(QIODevice::Append | QIODevice::Text)) {
-        QTextStream stream(&f);
-        stream.setCodec("UTF-8");
-        stream << resultLog << endl;
-        f.close();
-    }
+    auto parameters = globalParamters;
+    parameters.append(PStringPairList {
+        {"date", QDate::currentDate().toString(Qt::ISODate)}
+    });
 
     foreach (auto fileName, logFileNamePattern.value(logType)) {
-        qDebug() << fileName;
-        QFile file(PString::format(fileName, paramters));
+        QFile file(PString::format(fileName, parameters));
         if (file.open(QIODevice::Append | QIODevice::Text)) {
             QTextStream stream(&file);
+            stream.setCodec("UTF-8");
             stream << resultLog << endl;
             file.close();
         }

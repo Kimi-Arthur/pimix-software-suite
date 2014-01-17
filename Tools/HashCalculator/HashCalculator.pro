@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = HashCalculator
 TEMPLATE = app
 
-DESTDIR = $$BASE_DIR"bin/"
+DESTDIR = $$BIN_DIR
 
 SOURCES += main.cpp\
         mainwindow.cpp
@@ -20,9 +20,9 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtGui/release/ -lPtGui
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtGui/debug/ -lPtGui
-else:unix: LIBS += -L$$OUT_PWD/../../Library/PtGui/ -lPtGui
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtGui/release/ -lPtGui
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtGui/debug/ -lPtGui
+else:unix: LIBS += -L$$SRC_DIR/Library/PtGui/ -lPtGui
 
-INCLUDEPATH += $$PWD/../../Library/PtGui
-DEPENDPATH += $$PWD/../../Library/PtGui
+INCLUDEPATH += $$SRC_DIR/Library/PtGui
+DEPENDPATH += $$SRC_DIR/Library/PtGui

@@ -48,7 +48,7 @@ private:
     const qint64 MaxBlockSize = 2 * PFile::GigabyteSize;
     const qint64 MaxBlockCount = 1024;
     const qint64 MaxThreadCount = 8;
-    PNetworkAccessManager *manager = new PNetworkAccessManager();
+    PNetworkAccessManager *manager;
 
     QStringList currentFileList;
     QString currentFileListCursor = "null";

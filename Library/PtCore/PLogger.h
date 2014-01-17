@@ -28,14 +28,16 @@ public:
 
     // Public Constants
     const QString DefaultLogPattern = "[{datetime}][{type}] {content}";
-    const QString DefaultLogFileNamePattern = "{base_path}/{date}/{iid}-{pid}-{time}";
+    const QString DefaultLogFileNamePattern = "{base_path}-{date}";
     const LogType DefaultDisplayBound = LogType::InformationLog;
 
     // Public Data Memebers
     QString logPattern; // What the logs contain.
     LogType displayBound; // Which logs will be displayed.
     QMap<LogType, QSet<QString>> logFileNamePattern; // What the log files' names are.
-    PStringPairList paramters; // Customized fill-in parameters.
+    PStringPairList globalParamters {
+        {"LogFileNamePattern", DefaultLogFileNamePattern}
+    }; // Customized fill-in parameters.
 
     // Public Constructors
     PLogger();

@@ -7,6 +7,8 @@
 #include "PtNetwork_global.h"
 #include <map>
 
+#include "PLogger.h"
+
 
 namespace Pt {
 namespace Network {
@@ -15,8 +17,9 @@ class PTNETWORKSHARED_EXPORT PNetworkAccessManager : public QNetworkAccessManage
 {
     Q_OBJECT
     PNetworkRetryPolicy *defaultRetryPolicy;
+    Pt::Core::PLogger *logger;
 public:
-    explicit PNetworkAccessManager(QObject *parent = 0);
+    explicit PNetworkAccessManager(Pt::Core::PLogger *logger = nullptr, QObject *parent = 0);
     void setRetryPolicy(PNetworkRetryPolicy *retryPolicy);
     QNetworkReply *executeNetworkRequest(HttpVerb verb, QNetworkRequest request,
                                          const QByteArray &data, PNetworkRetryPolicy *retryPolicy);

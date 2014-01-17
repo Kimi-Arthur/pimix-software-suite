@@ -3,7 +3,6 @@
 
 #include <QNetworkReply>
 #include "PtNetwork_global.h"
-#include <QDebug>
 
 namespace Pt {
 namespace Network {

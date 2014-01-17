@@ -2,7 +2,6 @@
 #define PSERIALIZER_H
 
 #include "PtCore.h"
-#include <QDebug>
 
 namespace Pt {
 namespace Core {
