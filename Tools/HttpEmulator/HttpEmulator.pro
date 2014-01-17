@@ -8,11 +8,10 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += C++11
 TARGET = HttpEmulator
 TEMPLATE = app
 
-DESTDIR = $$BASE_DIR"bin/"
+DESTDIR = $$BIN_DIR
 
 SOURCES += main.cpp\
         MainWindow.cpp
@@ -21,17 +20,17 @@ HEADERS  += MainWindow.h
 
 FORMS    += MainWindow.ui
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtNetwork/release/ -lPtNetwork
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtNetwork/debug/ -lPtNetwork
-else:unix: LIBS += -L$$OUT_PWD/../../Library/PtNetwork/ -lPtNetwork
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtNetwork/release/ -lPtNetwork
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtNetwork/debug/ -lPtNetwork
+else:unix: LIBS += -L$$SRC_DIR/Library/PtNetwork/ -lPtNetwork
 
-INCLUDEPATH += $$PWD/../../Library/PtNetwork
-DEPENDPATH += $$PWD/../../Library/PtNetwork
+INCLUDEPATH += $$SRC_DIR/Library/PtNetwork
+DEPENDPATH += $$SRC_DIR/Library/PtNetwork
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtGui/release/ -lPtGui
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../Library/PtGui/debug/ -lPtGui
-else:unix: LIBS += -L$$OUT_PWD/../../Library/PtGui/ -lPtGui
+win32:CONFIG(release, debug|release): LIBS += -L$$SRC_DIR/Library/PtGui/release/ -lPtGui
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$SRC_DIR/Library/PtGui/debug/ -lPtGui
+else:unix: LIBS += -L$$SRC_DIR/Library/PtGui/ -lPtGui
 
-INCLUDEPATH += $$PWD/../../Library/PtGui
-DEPENDPATH += $$PWD/../../Library/PtGui
+INCLUDEPATH += $$SRC_DIR/Library/PtGui
+DEPENDPATH += $$SRC_DIR/Library/PtGui

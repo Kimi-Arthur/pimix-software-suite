@@ -4,8 +4,10 @@
 #include <QTimer>
 #include <QNetworkReply>
 
-Pt::Network::PNetworkAccessManager::PNetworkAccessManager(QObject *parent) :
-    QNetworkAccessManager(parent), defaultRetryPolicy(PNetworkRetryPolicy::DefaultRetryPolicy())
+Pt::Network::PNetworkAccessManager::PNetworkAccessManager(Pt::Core::PLogger *logger, QObject *parent)
+    : QNetworkAccessManager(parent),
+      defaultRetryPolicy(PNetworkRetryPolicy::DefaultRetryPolicy()),
+      logger(logger)
 {
 }
 
@@ -16,15 +18,17 @@ void Pt::Network::PNetworkAccessManager::setRetryPolicy(Pt::Network::PNetworkRet
 
 QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(Pt::Network::HttpVerb verb, QNetworkRequest request, const QByteArray &data, Pt::Network::PNetworkRetryPolicy *retryPolicy)
 {
-    qDebug() << request.url();
+    logger->logMethodIn(__PFUNC_ID__);
+    logger->debug(request.url(), "Request url");
     QNetworkReply *reply = nullptr;
     int i = 0;
     for (retryPolicy->initializeRetry(); retryPolicy->needToTry(); retryPolicy->moveNext()) {
         // Clear reply from start other than finish to preserve failure status
         if (reply != nullptr)
             reply->deleteLater();
-        qDebug() << retryPolicy->timeout() << retryPolicy->needToTry();
-        qDebug() << QString("Tried %1 times").arg(i++);
+
+        logger->debug(QString("Started %1 try:").arg(++i));
+
         switch (verb) {
         case HttpVerb::Get:
             reply = get(request);
@@ -46,14 +50,19 @@ QNetworkReply *Pt::Network::PNetworkAccessManager::executeNetworkRequest(Pt::Net
         }
         QEventLoop loop;
         connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-        //connect(reply, &QNetworkReply::uploadProgress, [](int i){qDebug() << i;});
+
         // Temp code for Qt's old syntax.
         QTimer::singleShot(retryPolicy->timeout(), &loop, SLOT(quit()));
         loop.exec();
         if (retryPolicy->validate(reply))
+        {
+            logger->debug(QString("Succeeded %1 try.").arg(i));
             break;
-        qDebug() << QString("Failed %1 times").arg(i);
+        }
+
+        logger->debug(QString("Failed %1 try.").arg(i));
     }
+    logger->logMethodOut(__PFUNC_ID__);
     return reply;
 }
 

@@ -1,8 +1,5 @@
 #include "PtCore.h"
 
-#include <QDebug>
-
-
 QString Pt::Core::dateTimeToString(QDateTime dt, Qt::DateFormat format, QString separator)
 {
     if (format != Qt::ISODate)

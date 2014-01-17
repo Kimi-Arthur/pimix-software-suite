@@ -23,13 +23,14 @@ BaiduCloudAccount::BaiduCloudAccount(const BaiduCloudAccountInfo &accountInfo, P
       settingsMap(settingsMap),
       logger(logger)
 {
-    logger->logMethodIn(__PFUNC_ID__);
+    this->logger->logMethodIn(__PFUNC_ID__);
 
+    manager = new PNetworkAccessManager(this->logger);
     manager->setRetryPolicy(PNetworkRetryPolicy::LimitedRetryPolicy(5, 600000));
 
-    logger->debug(accountInfo.username, "username");
+    this->logger->debug(accountInfo.username, "username");
 
-    logger->logMethodOut(__PFUNC_ID__);
+    this->logger->logMethodOut(__PFUNC_ID__);
 }
 
 ResultType BaiduCloudAccount::downloadFile(QString remotePath, QString localPath)

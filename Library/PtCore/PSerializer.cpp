@@ -1,5 +1,6 @@
 #include "PSerializer.h"
 #include <QStringList>
+#include <QUrl>
 #include "PJsonValue.h"
 
 using namespace Pt::Core;
@@ -47,6 +48,16 @@ DeclStart_SerializeFunctions(QString) =
 DeclStart_DeserializeFunctions(QString) =
 {
     DeclEntry_DeserializeFunction(Normal, QString, return data;)
+};
+
+DeclStart_SerializeFunctions(QUrl) =
+{
+    DeclEntry_SerializeFunction(Normal, QUrl, return value.toString(); )
+};
+
+DeclStart_DeserializeFunctions(QUrl) =
+{
+    DeclEntry_DeserializeFunction(Normal, QUrl, return QUrl(data); )
 };
 
 DeclStart_DeserializeFunctions(char *) =

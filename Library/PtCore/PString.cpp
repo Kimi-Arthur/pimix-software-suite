@@ -1,7 +1,4 @@
 #include "PString.h"
-
-#include <QDebug>
-
 #include "PSerializer.h"
 
 namespace Pt {
