@@ -119,17 +119,6 @@ void BaiduCloudAccount::showProgress(qint64 bs, qint64 bt)
     }
 }
 
-qint64 BaiduCloudAccount::getBlockSize(qint64 fileSize)
-{
-    if (fileSize > MaxBlockCount * MaxBlockSize)
-        return 0;
-    qint64 blockSize = BaseBlockSize;
-    while (MaxBlockCount * blockSize < fileSize)
-        blockSize <<= BlockSizeIncrementalStep;
-
-    return blockSize;
-}
-
 bool BaiduCloudAccount::diffFileList()
 {
     logger->logMethodIn(__PFUNC_ID__);
@@ -365,7 +354,7 @@ QString BaiduCloudAccount::uploadBlock(const QByteArray &data)
 
     parameters.insert(settingsMap->begin(), settingsMap->end());
 
-    PNetworkAccessManager m;
+    PNetworkAccessManager m(logger);
     m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1800000, 600000));
     QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Put, PString::format(settingsMap->at("apis/upload_block/url"), parameters), data);
     auto result = reply->readAll();
