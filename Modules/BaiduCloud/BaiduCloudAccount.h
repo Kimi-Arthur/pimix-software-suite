@@ -59,7 +59,6 @@ private slots:
     void showProgress(qint64 bs, qint64 bt);
 
 private:
-    qint64 getBlockSize(qint64 fileSize);
     bool diffFileList();
     PStringMap getFileInfos(const QString &localPath);
     ResultType uploadFileRapid(const QString &remotePath, const QString &localPath);
