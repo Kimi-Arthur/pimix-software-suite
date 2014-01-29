@@ -8,6 +8,8 @@ QT       += core
 
 QT       -= gui
 
+DESTDIR = $$BIN_DIR
+
 TARGET = FileScissors
 CONFIG   += console
 CONFIG   -= app_bundle

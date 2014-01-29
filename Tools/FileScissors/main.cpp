@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 
     qDebug() << QDateTime::currentDateTime();
     int count = PFile::splitFile(argv[1], argv[2], QString(argv[3]).toLongLong());
+    return 0;
     qDebug() << QDateTime::currentDateTime();
     QStringList l;
     l.reserve(count);
