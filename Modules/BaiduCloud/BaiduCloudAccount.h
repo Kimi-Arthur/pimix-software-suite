@@ -65,9 +65,12 @@ private:
     ResultType uploadFileDirect(QString remotePath, QString localPath);
     ResultType uploadFileByBlockMultithread(QString remotePath, QString localPath);
     ResultType uploadFileByBlockSinglethread(QString remotePath, QString localPath);
+    ResultType downloadFileDirect(QString remotePath, QString localPath);
+    ResultType downloadFileByBlockSinglethread(QString remotePath, QString localPath);
     bool pathExists(const QString &remotePath);
     bool verifyFile(const QString &remotePath);
     QString uploadBlock(const QByteArray &data);
+    QByteArray downloadBlock(const QString &remotePath, qint64 startIndex, qint64 blockSize);
     ResultType mergeBlocks(QString remotePath, QStringList blockHashList);
 };
 
