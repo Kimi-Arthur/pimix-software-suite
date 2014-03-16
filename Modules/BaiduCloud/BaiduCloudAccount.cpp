@@ -35,7 +35,7 @@ BaiduCloudAccount::BaiduCloudAccount(const BaiduCloudAccountInfo &accountInfo, P
 
 ResultType BaiduCloudAccount::downloadFile(QString remotePath, QString localPath)
 {
-    return ResultType::Failure;
+    return downloadFileDirect(remotePath, localPath);
 }
 
 ResultType BaiduCloudAccount::uploadFile(QString remotePath, QString localPath, bool multithread)
@@ -61,7 +61,7 @@ ResultType BaiduCloudAccount::uploadFile(QString remotePath, QString localPath, 
     f.close();
     // Try rapid upload first
     if (uploadFileRapid(remotePath, localPath) == ResultType::Success) {
-        logger->debug(PString::format("Succeeded with uploadFileRapid, {LocalPath}", {{"LocalPath", localPath}}));
+        logger->debug(PString::format("Succeeded with uploadFileRapid, {local_path}", {{"local_path", localPath}}));
         logger->logMethodOut(__PFUNC_ID__);
         return ResultType::Success;
     }
@@ -69,13 +69,13 @@ ResultType BaiduCloudAccount::uploadFile(QString remotePath, QString localPath, 
     ResultType result;
     if (fileSize <= BaseBlockSize) {
         result = uploadFileDirect(remotePath, localPath);
-        logger->debug(result, PString::format("Result for {LocalPath} via uploadFileDirect", {{"LocalPath", localPath}}));
+        logger->debug(result, PString::format("Result for {local_path} via uploadFileDirect", {{"local_path", localPath}}));
     } else if (multithread) {
         result = uploadFileByBlockMultithread(remotePath, localPath);
-        logger->debug(result, PString::format("Result for {LocalPath} via uploadFileByBlockMultithread", {{"LocalPath", localPath}}));
+        logger->debug(result, PString::format("Result for {local_path} via uploadFileByBlockMultithread", {{"local_path", localPath}}));
     } else {
         result = uploadFileByBlockSinglethread(remotePath, localPath);
-        logger->debug(result, PString::format("Result for {LocalPath} via uploadFileByBlockSinglethread", {{"LocalPath", localPath}}));
+        logger->debug(result, PString::format("Result for {local_path} via uploadFileByBlockSinglethread", {{"local_path", localPath}}));
     }
 
     logger->logMethodOut(__PFUNC_ID__);
@@ -321,6 +321,27 @@ ResultType BaiduCloudAccount::uploadFileByBlockSinglethread(QString remotePath, 
     return result;
 }
 
+ResultType BaiduCloudAccount::downloadFileDirect(QString remotePath, QString localPath)
+{
+    logger->logMethodIn(__PFUNC_ID__);
+    PStringMap parameters {
+        {"access_token", accountInfo.accessToken},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)}
+    };
+
+    parameters.insert(settingsMap->begin(), settingsMap->end());
+
+    PNetworkAccessManager m(logger);
+    m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1800000, 600000));
+    QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Get, PString::format(settingsMap->at("apis/download_file/url"), parameters));
+    auto result = reply->readAll();
+    reply->deleteLater();
+
+    logger->debug(result.size(), "Downloaded size");
+    logger->logMethodOut(__PFUNC_ID__);
+    return ResultType::Failure;
+}
+
 bool BaiduCloudAccount::pathExists(const QString &remotePath)
 {
     logger->logMethodIn(__PFUNC_ID__);
@@ -365,12 +386,42 @@ QString BaiduCloudAccount::uploadBlock(const QByteArray &data)
     return blockUploadResult["md5"].toString();
 }
 
+QByteArray BaiduCloudAccount::downloadBlock(const QString &remotePath, qint64 startIndex, qint64 blockSize)
+{
+    logger->logMethodIn(__PFUNC_ID__);
+    PStringMap parameters {
+        {"access_token", accountInfo.accessToken},
+        {"remote_path", QUrl::toPercentEncoding(remotePath)}
+    };
+
+    parameters.insert(settingsMap->begin(), settingsMap->end());
+
+    PNetworkAccessManager m(logger);
+    m.setRetryPolicy(PNetworkRetryPolicy::UnlimitedRetryPolicy(1800000, 600000));
+    QNetworkRequest request(PString::format(settingsMap->at("apis/download_file/url"), parameters));
+    request.setRawHeader(
+                "Range",
+                PString::format(
+                    "bytes={0}-{1}",
+                    {
+                        { "0", QString::number(startIndex) },
+                        { "1", QString::number(startIndex + blockSize - 1) }
+                    }).toUtf8());
+    QNetworkReply *reply = m.executeNetworkRequest(HttpVerb::Get, request);
+    auto result = reply->readAll();
+    reply->deleteLater();
+
+    logger->debug(result.size(), "Downloaded size");
+    logger->logMethodOut(__PFUNC_ID__);
+    return result;
+}
+
 ResultType BaiduCloudAccount::mergeBlocks(QString remotePath, QStringList blockHashList)
 {
     logger->logMethodIn(__PFUNC_ID__);
 
     PStringMap parameters {
-        {"remote_path", QUrl::toPercentEncoding(remotePath)},
+        {"remote_path", QUrl::toPercentEncoding(QUrl::toPercentEncoding(remotePath))},
         {"access_token", accountInfo.accessToken}
     };
 
